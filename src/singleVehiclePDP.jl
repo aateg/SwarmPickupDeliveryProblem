@@ -1,6 +1,7 @@
 using JuMP
 using HiGHS
 using DelimitedFiles
+using OffsetArrays
 
 # Questions:
 # 1. The matrix C needs to include depot distances, how can I do that?
@@ -38,13 +39,17 @@ function read_data()
 
 end
 
-function singleVehiclePickupDeliveryNoCapacityModel(c::Matrix{Int}, P::Vector{Int}, D::Vector{Int})
+function singleVehiclePickupDeliveryNoCapacityModel(c::Matrix{Int}, P::Vector{Int}, D::Vector{Int}, n::Int)
     model = Model(HiGHS.Optimizer)
     set_silent(model)
 
+    # Modify Index
+    n = size(P)
+    P = P .+ 1
+    D = D .+ 1
+
     ## Sets 
-    n = size(P) # 
-    V = union([0], P, D)
+    V = union([1], P, D, [2n+2]) # set of vertices
 
     ## Variables
     @variable(model, x[i in V, j in V], Bin)
@@ -53,20 +58,22 @@ function singleVehiclePickupDeliveryNoCapacityModel(c::Matrix{Int}, P::Vector{In
     @objective(model, Min, sum(c[i, j] * x[i, j] for i in V, j in V)
 
     ## Constraints
-    # Each customer is picked up exactly once
-    @constraint(model, [i in P], sum(x[i, :] - x[n + i, :]) == 1) 
+    # 6.18
+    @constraint(model, [i in P], sum(x[i, :]) == 1) 
 
-    # Each customer is served exactly once
-    for j in J
-        @constraint(model, sum(x[i, j] for i in V) == 1)
-    end
+    # 6.19
+    @constraint(model, [i in P], sum(x[i, j] - x[n + i, j] for j in V) == 0) 
 
-    # The begin depot is not a customer
-    @constraint(model, sum(x[i, 1] for i in V) == 0)
-    # The end depot is not a pickup location. If I don't use this depot I don't need this constraint
-    @constraint(model, sum(x[2n+1, j] for j in V) == 0)
+    # 6.20 first depot
+    @constraint(model, sum(x[1, :]) == 1)
+    
+    # 6.21
+    @constraint(model, [i in union(P, D)], sum(x[j, i] - x[i, j] for j in V) == 0)
+    
+    # 6.22 last depot
+    @constraint(model, sum(x[2n+2, j] for j in V) == 0)
 
-    # Ensure that first go to pickup then delivery
+    # Precedence constraints
     @constraint(model, B[i] < B[i+1] for i in P)
 
     optimize!(model)
