@@ -1,80 +1,56 @@
-using JuMP
-using HiGHS
-using DelimitedFiles
-using OffsetArrays
+module SingleVehiclePDP
 
-# Questions:
-# 1. The matrix C needs to include depot distances, how can I do that?
-# 2. Can I use only one depot? How can I do that? I think I can't
+    export build_spdp_model
 
-# TODO:
-# 1. Fix constraints, paper is not precise enough, use book
+    using JuMP
+    using HiGHS
 
-# Next steps:
-# 1. Add capacity constraints
-
-function precedenceVariable(P::vector{Int}, D::vector{Int})
-    # create a variable B that is equal to one 
-    # pickup P[i] is associated to delivery D[i] by i + n
-    # I need to make some precedence constraints
-    # that tells that you cannot go to D[i] before P[i]
-    # I need to create a vector of size 2n
-    n = size(P)
-    B = zeros(2n)
-    B[i in P] = 0
-    B[i in D] = 1
-    return B
-
-end
-
-function read_data()
-    pathDistanceMatrix = joinpath(@__DIR__, "..", "data", "distanceMatrix.txt")
-    pathPickups = joinpath(@__DIR__, "..", "data", "pickups.txt")
-    pathDeliveries = joinpath(@__DIR__, "..", "data", "deliveries.txt")
-
-    C = readdlm(open(pathDistanceMatrix), ' ', Int, '\n')
-    P = readdlm(open(pathPickups), ' ', Int, '\n')
-    D = readdlm(open(pathDeliveries), ' ', Int, '\n')
-    return C, P, D
-
-end
-
-function singleVehiclePickupDeliveryNoCapacityModel(c::Matrix{Int}, P::Vector{Int}, D::Vector{Int}, n::Int)
-    model = Model(HiGHS.Optimizer)
-    set_silent(model)
-
-    # Modify Index
-    n = size(P)
-    P = P .+ 1
-    D = D .+ 1
-
-    ## Sets 
-    V = union([1], P, D, [2n+2]) # set of vertices
-
-    ## Variables
-    @variable(model, x[i in V, j in V], Bin)
-
-    ## Objective
-    @objective(model, Min, sum(c[i, j] * x[i, j] for i in V, j in V)
-
-    ## Constraints
-    # 6.18
-    @constraint(model, [i in P], sum(x[i, :]) == 1) 
-
-    # 6.19
-    @constraint(model, [i in P], sum(x[i, j] - x[n + i, j] for j in V) == 0) 
-
-    # 6.20 first depot
-    @constraint(model, sum(x[1, :]) == 1)
+    function build_spdp_model(c, P, D, n)
+        model = Model(HiGHS.Optimizer)
+        set_silent(model)
+        ## Sets 
+        last_depot = 2n + 2
+        V = union([1], P, D, [last_depot]) 
+        V_without_first_depot = union(P, D, [last_depot])
+        V_without_last_depot = union(P, D, )
+        B = precedenceVar(P, D, n)
     
-    # 6.21
-    @constraint(model, [i in union(P, D)], sum(x[j, i] - x[i, j] for j in V) == 0)
+        @variable(model, x[i in V, j in V], Bin)
+        @objective(model, Min, sum(c .* x) / 2)
+        ## Constraints
+        # 2
+        @constraint(model, [j in V_without_first_depot], sum(x[:, j]) == 1)
+        # 3
+        @constraint(model, [i in V_without_last_depot], sum(x[i, :]) == 1)
+        # 4
+        for i in V
+            @constraint(model, x[i, 1] == 0)
+        end
+        # 5
+        for j in V
+            @constraint(model, x[last_depot, j] == 0)
+        end
+        # 9 
+        @constraint(model, B[P] .<= B[D])
+        # 10
+        for i in V
+            for j in V
+                @constraint(model, x[i, j] * B[i] <= B[j])
+            end
+        end
+        # Extra
+        @constraint(model, [i in V], x[i,  i] == 0)
+        return model
+    end
     
-    # 6.22 last depot
-    @constraint(model, sum(x[2n+2, j] for j in V) == 0)
+    function precedenceVar(P::Vector{Int64}, D::Vector{Int64}, n::Int64)
+        B = zeros(2n+2)
+        depot = 2n+2
+        B[D] .= 2
+        B[depot] = 2
+        B[P] .= 1
+        B[1] = 1
+        return B
+    end
 
-    # Precedence constraints
-    @constraint(model, B[i] < B[i+1] for i in P)
-
-    optimize!(model)
-end
+end # module

@@ -99,6 +99,18 @@ git-tree-sha1 = "a69dd6db8a809f78846ff259298678f0d6212180"
 uuid = "f6369f11-7733-5829-9624-2563aa707210"
 version = "0.10.34"
 
+[[HiGHS]]
+deps = ["HiGHS_jll", "MathOptInterface", "SnoopPrecompile", "SparseArrays"]
+git-tree-sha1 = "218ffc6232c5d590b595d8a087a50e2ccbf5a9ac"
+uuid = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
+version = "1.4.3"
+
+[[HiGHS_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "17fdde1c1aa35edfd006d08f95f311ab517b3236"
+uuid = "8fd58aa0-07eb-5a78-9b36-339c94fd15ea"
+version = "1.4.2+0"
+
 [[InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"

@@ -2,6 +2,6 @@ module SwarmPickupDeliveryProblem
 
 include("singleVehiclePDP.jl")
 
-singleVehiclePickupDeliveryNoCapacityModel()
+export singleVehiclePickupDeliveryNoCapacityModel, read_data
 
 end # module
