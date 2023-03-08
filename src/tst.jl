@@ -1,8 +1,8 @@
 module Tst
 
-using Random: MersenneTwister
+using Random: MersenneTwister, AbstractRNG
 
-include("TSPGA.jl")
+include("TSPGA/TSPGA.jl")
 import .TSPGA
 
 function generate_distance_matrix(N::Int, rng::AbstractRNG)

@@ -2,7 +2,7 @@ module TSPGA
 
 export genetic_algorithm
 
-using Random: randperm
+using Random: randperm, AbstractRNG
 
 include("genetic_operators.jl")
 import .GeneticOperators
@@ -16,17 +16,26 @@ end
 
 function genetic_algorithm(N, dist, population_size, max_generations, rng)
 
+    # Parameters
+    p_cross = 0.7
+    p_mutate = 0.1
+
+    # Define the objective function
     obj_function(chromosome::Vector{Int}) = obj_function(chromosome, dist)
+    # Initialize the population
+    generation_parent = initialize_generation(N, population_size, rng)
 
-    generation = initialize_generation(N, population_size, rng)
     for i in 1:max_generations
-        
-        GeneticOperators.selection!(generation, obj_function, rng)
-        GeneticOperators.crossover!(generation,  p_cross, rng)
-        GeneticOperators.mutate!(generation, p_mutate, rng)
-
+        # Select the parents to be mated
+        idx_generation_parent = GeneticOperators.roulette_wheel_selection(generation_parent, obj_function, rng)
+        # Crossover
+        offspring = GeneticOperators.crossover(idx_generation_parent, generation_parent,  p_cross, rng)
+        # Mutation
+        #GeneticOperators.mutate!(offspring, p_mutate, rng)
+        # Selection of the fittest
+        generation_parent = sort([generation_parent; offspring], by=obj_function, rev=true)[1:population_size]
     end
-    return population
+    return generation_parent
 end
 
 end # module

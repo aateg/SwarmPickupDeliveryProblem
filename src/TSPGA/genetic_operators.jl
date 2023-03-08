@@ -1,32 +1,53 @@
 module GeneticOperators
 
-export selection!, crossover!, mutate!
+export roulette_wheel_selection, tournament_selection, crossover, mutate!
 
 using Random: rand, AbstractRNG
 using StatsBase: sample!, Weights
 
 Generation = Vector{Vector{Int}}
 
-function selection!(generation::Generation, obj_function::Function, rng::AbstractRNG)
-    population_size = length(generation)
-    
-    fitness = obj_function(chromosome)
-    fitness = Weights(fitness ./ sum(fitness))
-    
-    idx_pop = sample(rng, 1:population_size, fitness, population_size÷2, replace=false)
-    generation = generation[idx_pop]
+function tournament_selection(generation::Generation, obj_function::Function, rng::AbstractRNG)
+    fitness = obj_function.(generation)
+    idx_gen_parents = Int[]
+    for _ in 1:length(generation)
+        tournament_selection!(idx_gen_parents, generation, obj_function, rng)
+    end
+    return idx_gen_parents
 end
 
-function crossover!(generation::Generation, p_cross::Float64, rng::AbstractRNG)
+function tournament_selection!(idx_gen_parents::Vector{Int}, generation::Generation, obj_function::Function, rng::AbstractRNG)
+    population_size = length(generation)
+    idx_pop = sample(rng, 1:population_size, 2, replace=false)
+    fitness = obj_function.(generation[idx_pop])
+    push!(idx_gen_parents, idx_pop[argmax(fitness)]) 
+end
+
+function roulette_wheel_selection(generation::Generation, obj_function::Function, rng::AbstractRNG) 
+    offspring_size = div(length(generation), 2)
+    fitness = obj_function.(generation)
+    idx_gen_parents = Int[]
+    for _ in 1:offspring_size
+        roulette_wheel_selection!(idx_gen_parents, generation, obj_function, rng)
+    end
+    return idx_gen_parents
+end 
+
+function roulette_wheel_selection!(idx_gen_parents::Vector{Int}, generation::Generation, fitness::Vector{Float64}, rng::AbstractRNG)
+    population_size = length(generation)
+    fitness = Weights(fitness ./ sum(fitness))
+    idx_parents = sample(rng, 1:population_size, fitness, 2, replace=false)
+    push!(idx_gen_parents, idx_parents[1])
+    push!(idx_gen_parents, idx_parents[2])
+end
+
+function crossover!(offspring::Generation, generation::Generation, p_cross::Float64, rng::AbstractRNG)
     # get two on two combinations of chromosomes for population
     # and perform crossover
     N = length(generation)
-    children = []
     for i in 1:N, j in i+1:N
         c1 = pmx_crossover(population[i], population[j], p_cross, rng)
-        c2 = pmx_crossover(population[j], population[i], p_cross, rng)
-        push!(generation, c1)
-        push!(generation, c2)
+        push!(offspring, c1)
     end
 end
 
