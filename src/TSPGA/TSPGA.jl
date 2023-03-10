@@ -2,16 +2,16 @@ module TSPGA
 
 export genetic_algorithm
 
-using Random: randperm, AbstractRNG
+using Random: shuffle, AbstractRNG
 
 include("genetic_operators.jl")
 import .GeneticOperators
 
-function initialize_generation(N::Int, population_size::Int, rng::AbstractRNG)
-    return collect(randperm(rng, N) for i in 1:population_size)
+function initialize_generation(sol_encoding, population_size::Int, rng::AbstractRNG)
+    return collect(shuffle(rng, sol_encoding) for i in 1:population_size)
 end
 
-function genetic_algorithm(N, dist, population_size, max_generations, rng)
+function genetic_algorithm(sol_encoding::Vector{Int64}, obj_function::Function, population_size::Int64, max_generations::Int64, rng::AbstractRNG)
 
     # Parameters
     p_cross = 0.7
