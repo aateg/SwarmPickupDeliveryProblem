@@ -1,10 +1,10 @@
 module SwarmPickupDeliveryProblem
 
-include("TSPGA/TSPGA.jl")
-import .TSPGA
+include("GeneticAlgorithm/GeneticAlgorithm.jl")
+import .GeneticAlgorithm: genetic_algorithm, GAConfig
 
-include("PDP/PDP.jl")
-import .PDP
+include("Problems/Problems.jl")
+import .Problems: generateRandomPickupDeliveryProblem, generateRandomTSP
 
 function main()
     # Random Number Generator
@@ -12,21 +12,22 @@ function main()
 
     # Problem Definition
     numberOfPickupDeliveries = 10
-    problem = PDP.generateRandomPickupDeliveryProblem(numberOfPickupDeliveries, rng)
+    problem = generateRandomPickupDeliveryProblem(numberOfPickupDeliveries, rng)
     
     # Genetic Algorithm Parameters
-    p_cross = 0.8
-    p_mut = 0.2
-    population_size = 10
-    max_generations = 100
+    parameters = GAConfig(
+        population_size = 10, 
+        max_generations = 100, 
+        p_cross = 0.8, 
+        p_mutate = 0.2
+    )
 
     # execution
     best_generation = TSPGA.genetic_algorithm(
         problem.encoding, 
         problem.obj_function, 
-        population_size, 
-        max_generations, 
-        problemTSP.rng
+        parameters, 
+        rng
     )
 
     # output

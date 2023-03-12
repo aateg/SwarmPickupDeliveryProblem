@@ -1,4 +1,4 @@
-module GeneticOperators
+module Operators
 
 export roulette_wheel_selection, tournament_selection, crossover, mutate!
 
