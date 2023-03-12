@@ -4,9 +4,6 @@ export geneticAlgorithm, Config
 
 using Random: shuffle, AbstractRNG
 
-include("../Problems/Problems.jl")
-import .Problems: Problem
-
 include("Operators.jl")
 import .Operators
 
@@ -25,19 +22,19 @@ function initializeGeneration(solEncoding::Vector{Int64}, populationSize::Int64,
     return collect(shuffle(rng, solEncoding) for i in 1:populationSize)
 end
 
-function geneticAlgorithm(problem::Problem, config::Config, rng::AbstractRNG)
+function geneticAlgorithm(solEncoding::Vector{Int64}, objFunction::Function, config::Config, rng::AbstractRNG)
     # Initialize the population
-    generationParent = initializeGeneration(problem.solEncoding, config.populationSize, rng)
+    generationParent = initializeGeneration(solEncoding, config.populationSize, rng)
 
     for _ in 1:config.maxGenerations
         # Select the parents to be mated
-        idxGenerationParent = Operators.roulette_wheel_selection(generationParent, problem.objFunction, rng)
+        idxGenerationParent = Operators.rouletteWheelSelection(generationParent, objFunction, rng)
         # Crossover
         offspring = Operators.crossover(idxGenerationParent, generationParent, config.pCross, rng)
         # Mutation
         #Operators.mutate!(offspring, config.pMutate, rng)
         # Selection of the fittest
-        generationParent = sort([generationParent; offspring], by=problem.objFunction, rev=true)[1:config.populationSize]
+        generationParent = sort([generationParent; offspring], by=objFunction, rev=true)[1:config.populationSize]
     end
     return generationParent
 end

@@ -48,15 +48,13 @@ struct PickupDeliveryProblem <: Problem
                 if x[i] == 0
                     s += dist[end, P[x[i+1]]] # depot is the last one
                 elseif x[i+1] == 0
-                    s += dist[D[x[i+1]], end]
+                    s += dist[D[x[i]], end]
                 else
-                    s += dist[D[x[i]], P[x[i+1]]]
+                    s += dist[D[x[i]], P[x[i+1]]] + dist[P[x[i]], D[x[i]]]
                 end
             end
             if x[end] == 0
                 s += dist[end, P[x[1]]]
-            elseif x[1] == 0
-                s += dist[D[x[end]], end]
             else
                 s += dist[D[x[end]], P[x[1]]]
             end

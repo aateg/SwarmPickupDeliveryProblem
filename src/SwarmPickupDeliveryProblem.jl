@@ -1,5 +1,7 @@
 module SwarmPickupDeliveryProblem
 
+using Random: MersenneTwister
+
 include("GeneticAlgorithm/GeneticAlgorithm.jl")
 import .GeneticAlgorithm: geneticAlgorithm, Config
 
@@ -15,24 +17,21 @@ function main()
     problem = generateRandomPDP(numberOfPickupDeliveries, rng)
     
     # Genetic Algorithm Parameters
-    parameters = Config(
-        populationSize = 10, 
-        maxGenerations = 100, 
-        pCross = 0.8, 
-        pMutate = 0.2
-    )
+    parameters = Config(10, 100, 0.8, 0.2)
 
     # execution
     bestGeneration = geneticAlgorithm(
-        problem, 
+        problem.encoding,
+        problem.objFunction, 
         parameters, 
         rng
     )
 
     # output
-    best_solution = best_generation[1]
-    println("Best solution: ", best_solution)
+    bestSolution = bestGeneration[1]
+    println("Best solution: ", bestSolution)
 
 end
 
+main()
 end # module
