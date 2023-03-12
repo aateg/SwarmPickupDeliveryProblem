@@ -12,11 +12,11 @@ import SwarmPickupDeliveryProblem.Problems: generateRandomPDP, generateRandomTSP
         possibleSolution = tsp.encoding
 
         @test tsp.numberOfCities == numberOfCities
-        @test size(tsp.distance_matrix) == (numberOfCities, numberOfCities)
+        @test size(tsp.distanceMatrix) == (numberOfCities, numberOfCities)
         @test size(tsp.X) == (numberOfCities,)
         @test size(tsp.Y) == (numberOfCities,)
         @test size(tsp.encoding) == (numberOfCities,)
-        @test 0 < tsp.obj_function(possibleSolution) < 1
+        @test 0 < tsp.objFunction(possibleSolution) < 1
     end
 
     @testset "Pickup Delivery Problem" begin
@@ -26,12 +26,12 @@ import SwarmPickupDeliveryProblem.Problems: generateRandomPDP, generateRandomTSP
         possibleSolution = pdp.encoding
 
         @test pdp.numberOfPickupDeliveries == numberOfPickupDeliveries
-        @test size(pdp.distance_matrix) == (numberOfCities, numberOfCities)
+        @test size(pdp.distanceMatrix) == (numberOfCities, numberOfCities)
         @test size(pdp.X) == (numberOfCities,)
         @test size(pdp.Y) == (numberOfCities,)
         @test size(pdp.P) == (numberOfPickupDeliveries,)
         @test size(pdp.D) == (numberOfPickupDeliveries,)
         @test size(pdp.encoding) == (numberOfPickupDeliveries + 1,)
-        @test 0 < pdp.obj_function(possibleSolution) < 1
+        @test 0 < pdp.objFunction(possibleSolution) < 1
     end
 end
