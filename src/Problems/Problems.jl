@@ -1,14 +1,71 @@
 module Problems
 
-export generateRandomTSP, generateRandomPickupDeliveryProblem
+export Problem, generateRandomTSP, generateRandomPDP
 
-include("TSP.jl")
-include("PDP.jl")
+using Random: rand, shuffle, AbstractRNG
 
-import .TSP: TravelSalesmanProblem
-import .PDP: PickupDeliveryProblem
+abstract type Problem end
 
-using Random: rand, randperm, AbstractRNG
+struct TravelSalesmanProblem <: Problem
+    numberOfCities::Int64
+    distance_matrix::Matrix{Float64}
+    X::Vector{Float64}
+    Y::Vector{Float64}
+    obj_function::Function
+    encoding::Vector{Int64}
+
+    function TravelSalesmanProblem(numberOfCities::Int64, dist::Matrix{Float64}, X::Vector{Float64}, Y::Vector{Float64})
+        function f(x::Vector{Int}, d::Matrix{Float64})
+            return sum(d[x[i], x[i+1]] for i in 1:length(x)-1) + d[x[end], x[1]]
+        end
+        obj_function(x) = 1 / f(x, dist)
+        encoding = collect(1:numberOfCities)
+        new(numberOfCities, dist, X, Y, obj_function, encoding)
+    end
+end
+
+struct PickupDeliveryProblem <: Problem
+    numberOfPickupDeliveries::Int64
+    distance_matrix::Matrix{Float64}
+    X::Vector{Float64}
+    Y::Vector{Float64}
+    P::Vector{Int64} # pickup locations
+    D::Vector{Int64} # delivery locations
+    obj_function::Function
+    encoding::Vector{Int64}
+
+    function PickupDeliveryProblem(
+        numberOfPickupDeliveries::Int64, 
+        dist::Matrix{Float64}, 
+        X::Vector{Float64}, 
+        Y::Vector{Float64}, 
+        P::Vector{Int64}, 
+        D::Vector{Int64}
+    )
+        function f(x, dist, P, D)
+            s = 0
+            for i in 1:length(x)-1
+                if x[i] == 0
+                    s += dist[end, P[x[i+1]]] # depot is the last one
+                elseif x[i+1] == 0
+                    s += dist[D[x[i+1]], end]
+                else
+                    s += dist[D[x[i]], P[x[i+1]]]
+                end
+            end
+            if x[end] == 0
+                s += dist[end, P[x[1]]]
+            elseif x[1] == 0
+                s += dist[D[x[end]], end]
+            else
+                s += dist[D[x[end]], P[x[1]]]
+            end
+        end
+        obj_function(x) = 1 / f(x, dist, P, D)
+        encoding = collect(0:numberOfPickupDeliveries)
+        new(numberOfPickupDeliveries, dist, X, Y, P, D, obj_function, encoding)
+    end
+end
 
 function generateDistanceMatrix(N::Int, rng::AbstractRNG)
     X = 100 * rand(rng, N)
@@ -22,10 +79,10 @@ function generateRandomTSP(numberOfCities::Int64, rng::AbstractRNG)
     return TravelSalesmanProblem(numberOfCities, distance_matrix, X, Y)
 end
 
-function generateRandomPickupDeliveryProblem(numberOfPickupDeliveries::Int64, rng::AbstractRNG)
+function generateRandomPDP(numberOfPickupDeliveries::Int64, rng::AbstractRNG)
     numberOfCities = 2 * numberOfPickupDeliveries + 1 # depot is the last one
     X, Y, distance_matrix = generateDistanceMatrix(numberOfCities, rng) # depot at the N+1 position
-    PandD = randperm(rng, 1:numberOfCities-1) # exclude the depot
+    PandD = shuffle(rng, 1:numberOfCities-1) # exclude the depot
     P = PandD[1:numberOfPickupDeliveries]
     D = PandD[numberOfPickupDeliveries+1:numberOfCities-1]
     return PickupDeliveryProblem(numberOfPickupDeliveries, distance_matrix, X, Y, P, D)

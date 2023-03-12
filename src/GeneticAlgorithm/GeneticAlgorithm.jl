@@ -1,43 +1,45 @@
 module GeneticAlgorithm
 
-export genetic_algorithm, GAConfig
+export geneticAlgorithm, Config
 
 using Random: shuffle, AbstractRNG
+
+include("../Problems/Problems.jl")
+import .Problems: Problem
 
 include("Operators.jl")
 import .Operators
 
-struct GAConfig
+struct Config
+    populationSize::Int64
+    maxGenerations::Int64
+    pCross::Float64
+    pMutate::Float64
 
-    population_size::Int64
-    max_generations::Int64
-    p_cross::Float64
-    p_mutate::Float64
-
-    function GAConfig(population_size::Int64, max_generations::Int64, p_cross::Float64, p_mutate::Float64)
-        new(population_size, max_generations, p_cross, p_mutate)
+    function Config(populationSize::Int64, maxGenerations::Int64, pCross::Float64, pMutate::Float64)
+        new(populationSize, maxGenerations, pCross, pMutate)
     end
 end
 
-function initialize_generation(sol_encoding, population_size::Int, rng::AbstractRNG)
-    return collect(shuffle(rng, sol_encoding) for i in 1:population_size)
+function initializeGeneration(solEncoding::Vector{Int64}, populationSize::Int64, rng::AbstractRNG)
+    return collect(shuffle(rng, solEncoding) for i in 1:populationSize)
 end
 
-function genetic_algorithm(sol_encoding::Vector{Int64}, obj_function::Function, config::GAConfig, rng::AbstractRNG)
+function geneticAlgorithm(problem::Problem, config::Config, rng::AbstractRNG)
     # Initialize the population
-    generation_parent = initialize_generation(sol_encoding, config.population_size, rng)
+    generationParent = initializeGeneration(problem.solEncoding, config.populationSize, rng)
 
-    for i in 1:config.max_generations
+    for _ in 1:config.maxGenerations
         # Select the parents to be mated
-        idx_generation_parent = GeneticOperators.roulette_wheel_selection(generation_parent, obj_function, rng)
+        idxGenerationParent = Operators.roulette_wheel_selection(generationParent, problem.objFunction, rng)
         # Crossover
-        offspring = GeneticOperators.crossover(idx_generation_parent, generation_parent, config.p_cross, rng)
+        offspring = Operators.crossover(idxGenerationParent, generationParent, config.pCross, rng)
         # Mutation
-        #GeneticOperators.mutate!(offspring, config.p_mutate, rng)
+        #Operators.mutate!(offspring, config.pMutate, rng)
         # Selection of the fittest
-        generation_parent = sort([generation_parent; offspring], by=obj_function, rev=true)[1:config.population_size]
+        generationParent = sort([generationParent; offspring], by=problem.objFunction, rev=true)[1:config.populationSize]
     end
-    return generation_parent
+    return generationParent
 end
 
 end # module
