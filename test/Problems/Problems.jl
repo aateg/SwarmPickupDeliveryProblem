@@ -1,4 +1,3 @@
-using Test
 using Random: MersenneTwister
 
 import SwarmPickupDeliveryProblem.Problems: generateRandomPDP, generateRandomTSP
