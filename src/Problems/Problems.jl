@@ -42,32 +42,23 @@ struct PickupDeliveryProblem <: Problem
         P::Vector{Int64}, 
         D::Vector{Int64}
     )
-        function f(x, dist, P, D)
+        function totalDistance(x, dist, P, D)
             s = 0
             for i in 1:length(x)-1
-                if x[i] == 0
-                    s += dist[end, P[x[i+1]]] # depot is the last one
-                elseif x[i+1] == 0
-                    s += dist[D[x[i]], end]
-                else
-                    s += dist[D[x[i]], P[x[i+1]]] + dist[P[x[i]], D[x[i]]]
-                end
+                s += dist[end, P[x[1]]] # depot to first pickup
+                s += dist[P[x[i]], D[x[i]]] # pickup to delivery
+                s += dist[D[x[i]], P[x[i+1]]] # delivery to next pickup
+                s += dist[D[x[end]], end] # last delivery to depot
             end
-            if x[end] == 0
-                s += dist[end, P[x[1]]]
-            elseif x[1] == 0
-                s += dist[D[x[end]], end]
-            else
-                s += dist[D[x[end]], P[x[1]]]
-            end
+            return s
         end
-        objFunction(x) = 1 / f(x, dist, P, D)
-        encoding = collect(0:numberOfPickupDeliveries)
+        objFunction(x) = 1 / totalDistance(x, dist, P, D)
+        encoding = collect(1:numberOfPickupDeliveries)
         new(numberOfPickupDeliveries, dist, X, Y, P, D, objFunction, encoding)
     end
 end
 
-function generateDistanceMatrix(N::Int, rng::AbstractRNG)
+function generateDistanceMatrix(N::Int64, rng::AbstractRNG)
     X = 100 * rand(rng, N)
     Y = 100 * rand(rng, N)
     d = [sqrt((X[i] - X[j])^2 + (Y[i] - Y[j])^2) for i in 1:N, j in 1:N]
