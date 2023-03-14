@@ -30,7 +30,7 @@ import SwarmPickupDeliveryProblem.Problems: generateRandomPDP, generateRandomTSP
         @test size(pdp.Y) == (numberOfCities,)
         @test size(pdp.P) == (numberOfPickupDeliveries,)
         @test size(pdp.D) == (numberOfPickupDeliveries,)
-        @test size(pdp.encoding) == (numberOfPickupDeliveries + 1,)
+        @test size(pdp.encoding) == (numberOfPickupDeliveries,)
         @test 0 < pdp.objFunction(possibleSolution) < 1
     end
 end

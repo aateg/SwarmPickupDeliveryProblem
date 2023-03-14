@@ -32,7 +32,7 @@ function geneticAlgorithm(solEncoding::Vector{Int64}, objFunction::Function, con
         # Crossover
         offspring = Operators.crossover(idxGenerationParent, generationParent, config.pCross, rng)
         # Mutation
-        #Operators.mutate!(offspring, config.pMutate, rng)
+        Operators.mutate!(offspring, config.pMutate, rng)
         # Selection of the fittest
         generationParent = sort([generationParent; offspring], by=objFunction, rev=true)[1:config.populationSize]
     end
