@@ -1,7 +1,8 @@
+using Random: MersenneTwister
 import SwarmPickupDeliveryProblem.GeneticAlgorithm.Operators
 
 @testset "Test Operators" begin
-    
+    rng = MersenneTwister(1234)
     @testset "Selectors" begin
         @testset "Roulette Wheel Selection" begin
             nothing
@@ -17,7 +18,10 @@ import SwarmPickupDeliveryProblem.GeneticAlgorithm.Operators
     end
 
     @testset "Mutation" begin
-        nothing
+        solution = [0, 1, 2, 3]
+        pMutate = 1
+        mutate!(solution, pMutate, rng)
+        @test solution != [0, 1, 2, 3]
     end
 
 end

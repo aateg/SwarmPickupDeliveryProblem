@@ -87,13 +87,14 @@ end
 function mutate!(generation::Generation, pMutate::Float64, rng::AbstractRNG)
     for chromosome in generation
         if rand(rng) < pMutate
-            mutate!(chromosome)
+            mutate!(chromosome, rng)
         end
     end
 end
 
-function mutate!(chromosome::Vector{Int})
-    nothing
+function mutate!(chromosome::Vector{Int}, rng::AbstractRNG)
+    idx1, idx2 = sample(rng, 1:length(chromossome), 2, replace=false)
+    chromosome[idx1], chromosome[idx2] = chromosome[idx2], chromosome[idx1]
 end
 
 end # module
