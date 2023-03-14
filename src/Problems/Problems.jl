@@ -55,6 +55,8 @@ struct PickupDeliveryProblem <: Problem
             end
             if x[end] == 0
                 s += dist[end, P[x[1]]]
+            elseif x[1] == 0
+                s += dist[D[x[end]], end]
             else
                 s += dist[D[x[end]], P[x[1]]]
             end
