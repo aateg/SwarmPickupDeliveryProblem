@@ -3,10 +3,10 @@ module SwarmPickupDeliveryProblem
 using Random: MersenneTwister
 
 include("GeneticAlgorithm/GeneticAlgorithm.jl")
-import .GeneticAlgorithm: geneticAlgorithm, Config
+using .GeneticAlgorithm: geneticAlgorithm, Config
 
 include("Problems/Problems.jl")
-import .Problems: generateRandomPDP, generateRandomTSP
+using .Problems: TSP, PDP, Utils
 
 function main()
     # Random Number Generator
@@ -33,5 +33,4 @@ function main()
 
 end
 
-main()
 end # module
