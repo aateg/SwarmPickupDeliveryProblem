@@ -1,10 +1,9 @@
 module PDP
 
+export PickupDeliveryProblem, generateRandomPDP, objFunction
+
 include("Utils.jl")
 import .Utils: DistanceMatrix, generateDistanceMatrix
-
-include("TSP.jl")
-import .TSP: TravelingSalesmanProblem
 
 struct PickupDeliveryProblem
     numberOfPickupDeliveries::Int64
@@ -31,14 +30,7 @@ function generateRandomPDP(numberOfPickupDeliveries::Int64, rng::AbstractRNG)
     return PickupDeliveryProblem(numberOfPickupDeliveries, distanceMatrix, P, D)
 end
 
-function convertToTSP(pdp::PickupDeliveryProblem)::TravelingSalesmanProblem
-    # TODO
-    # 1. Create a new distance matrix
-    numberOfCities = pdp.numberOfPickupDeliveries + 1 # depot is the last one
-    return TravelingSalesmanProblem(numberOfCities, newDistanceMatrix)
-end
-
-function totalDistanceTSP(x, dist, P, D)
+function totalDistancePairedPickupDelivery(x::Vector{Int64}, dist::Matrix{Float64}, P::Vector{Int64}, D::Vector{Int64})
     s = 0
     for i in 1:length(x)-1
         s += dist[end, P[x[1]]] # depot to first pickup
@@ -49,6 +41,8 @@ function totalDistanceTSP(x, dist, P, D)
     return s
 end
 
-objFunction(x) = 1 / totalDistanceTSP(x, dist, P, D)
+function objFunction(x::Vector{Int64}, pdp::PickupDeliveryProblem)
+    return 1 / totalDistancePairedPickupDelivery(x, pdp.distanceMatrix.d, pdp.P, pdp.D)
+end
 
 end # module

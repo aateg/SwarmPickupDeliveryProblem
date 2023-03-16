@@ -1,5 +1,7 @@
 module TSP
 
+export TravelSalesmanProblem, generateRandomTSP, objFunction
+
 include("Utils.jl")
 import .Utils: generateDistanceMatrix, DistanceMatrix
 
