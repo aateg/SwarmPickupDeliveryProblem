@@ -1,6 +1,7 @@
 using Random: MersenneTwister
 
-import SwarmPickupDeliveryProblem.GeneticAlgorithm.GeneticAlgorithm: initializeGeneration, Config
+import SwarmPickupDeliveryProblem.GeneticAlgorithm.GeneticAlgorithm:
+    initializeGeneration, Config
 
 @testset "Test Genetic Algorithm" begin
     rng = MersenneTwister(1234)

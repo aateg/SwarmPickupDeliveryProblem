@@ -16,10 +16,10 @@ struct PickupDeliveryProblem
     D::Vector{Int64} # delivery location
 
     function PickupDeliveryProblem(
-        numberOfPickupDeliveries::Int64, 
-        dist::DistanceMatrix, 
-        P::Vector{Int64}, 
-        D::Vector{Int64}
+        numberOfPickupDeliveries::Int64,
+        dist::DistanceMatrix,
+        P::Vector{Int64},
+        D::Vector{Int64},
     )
         new(numberOfPickupDeliveries, dist, P, D)
     end
@@ -34,10 +34,15 @@ function generateRandomPDP(numberOfPickupDeliveries::Int64, rng::AbstractRNG)
     return PickupDeliveryProblem(numberOfPickupDeliveries, distanceMatrix, P, D)
 end
 
-function totalDistancePairedPickupDelivery(x::Solution, dist::Matrix{Float64}, P::Vector{Int64}, D::Vector{Int64})
+function totalDistancePairedPickupDelivery(
+    x::Solution,
+    dist::Matrix{Float64},
+    P::Vector{Int64},
+    D::Vector{Int64},
+)
     s = 0
     s += dist[end, P[x[1]]] # depot to first pickup
-    for i in 1:length(x)-1
+    for i = 1:length(x)-1
         s += dist[P[x[i]], D[x[i]]] # pickup to delivery
         s += dist[D[x[i]], P[x[i+1]]] # delivery to next pickup
     end
