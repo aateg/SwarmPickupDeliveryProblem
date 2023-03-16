@@ -20,7 +20,7 @@ end
 
 function objFunction(x::Vector{Int64}, tsp::TravelSalesmanProblem)
     d = tsp.distanceMatrix.d
-    totalDistance = sum(d[x[i], x[i+1]] for i in 1:length(x)-1) + d[x[end], x[1]]
+    totalDistance = sum(d[x[i], x[i+1]] for i = 1:length(x)-1) + d[x[end], x[1]]
     return 1 / totalDistance
 end
 
