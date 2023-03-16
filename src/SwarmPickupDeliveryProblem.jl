@@ -15,17 +15,13 @@ function main()
     # Problem Definition
     numberOfPickupDeliveries = 10
     problem = generateRandomPDP(numberOfPickupDeliveries, rng)
-    
+
     # Genetic Algorithm Parameters
     parameters = Config(10, 100, 0.8, 0.2)
 
     # execution
-    bestGeneration = geneticAlgorithm(
-        problem.encoding,
-        problem.objFunction, 
-        parameters, 
-        rng
-    )
+    bestGeneration =
+        geneticAlgorithm(problem.encoding, problem.objFunction, parameters, rng)
 
     # output
     bestSolution = bestGeneration[1]

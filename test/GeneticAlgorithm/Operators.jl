@@ -7,7 +7,7 @@ import SwarmPickupDeliveryProblem.GeneticAlgorithm.Operators: mutate!
         @testset "Roulette Wheel Selection" begin
             nothing
         end
-    
+
         @testset "Tournament Selection" begin
             nothing
         end
@@ -32,5 +32,3 @@ import SwarmPickupDeliveryProblem.GeneticAlgorithm.Operators: mutate!
     end
 
 end
-
-
