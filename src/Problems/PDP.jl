@@ -2,8 +2,10 @@ module PDP
 
 export PickupDeliveryProblem, generateRandomPDP, objFunction
 
-include("Utils.jl")
+include("./Utils.jl")
 import .Utils: DistanceMatrix, generateDistanceMatrix
+
+using Random: AbstractRNG, shuffle
 
 Solution = Vector{Int64}
 
@@ -15,7 +17,7 @@ struct PickupDeliveryProblem
 
     function PickupDeliveryProblem(
         numberOfPickupDeliveries::Int64, 
-        dist::Distancematrix, 
+        dist::DistanceMatrix, 
         P::Vector{Int64}, 
         D::Vector{Int64}
     )
@@ -34,12 +36,12 @@ end
 
 function totalDistancePairedPickupDelivery(x::Solution, dist::Matrix{Float64}, P::Vector{Int64}, D::Vector{Int64})
     s = 0
+    s += dist[end, P[x[1]]] # depot to first pickup
     for i in 1:length(x)-1
-        s += dist[end, P[x[1]]] # depot to first pickup
         s += dist[P[x[i]], D[x[i]]] # pickup to delivery
         s += dist[D[x[i]], P[x[i+1]]] # delivery to next pickup
-        s += dist[D[x[end]], end] # last delivery to depot
     end
+    s += dist[D[x[end]], end] # last delivery to depot
     return s
 end
 

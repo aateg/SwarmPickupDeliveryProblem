@@ -2,8 +2,10 @@ module TSP
 
 export TravelSalesmanProblem, generateRandomTSP, objFunction
 
-include("Utils.jl")
+include("./Utils.jl")
 import .Utils: generateDistanceMatrix, DistanceMatrix
+
+using Random: AbstractRNG
 
 SolutionType = Vector{Int64}
 

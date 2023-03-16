@@ -1,5 +1,7 @@
 module Utils
 
+export DistanceMatrix, generateDistanceMatrix
+
 using Random: rand, AbstractRNG
 import Base: size
 
