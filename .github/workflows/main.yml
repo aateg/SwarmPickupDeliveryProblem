@@ -18,7 +18,7 @@ jobs:
         run: |
           julia -e '
           using Pkg; 
-          Pkg.add(JuliaFormatter");
+          Pkg.add("JuliaFormatter");
           using JuliaFormatter;
           if !format(".", verbose=true)
           @error "Some files have not been formatted !!!";
