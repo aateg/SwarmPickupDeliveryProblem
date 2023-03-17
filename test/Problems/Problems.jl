@@ -28,6 +28,19 @@ using SwarmPickupDeliveryProblem.Problems: TSP, PDP, Utils
         end
     end
 
+    @testset "Test Multiple Travel Salesmen Problem" begin
+        numberOfCities = 10
+        numberOfSalesmen = 3
+        mtsp = TSP.generateRandomMTSP(numberOfCities, numberOfSalesmen, rng)
+
+        @testset "Test Random MTSP initialization" begin
+            @test tsp.numberOfCities == numberOfCities
+            @test mtsp.numberOfSalesmen == numberOfSalesmen
+            @test size(tsp.distanceMatrix) == (numberOfCities, numberOfCities)
+        end
+
+    end
+
     @testset "Test Pickup Delivery Problem" begin
         numberOfPickupDeliveries = 4
         pdp = PDP.generateRandomPDP(numberOfPickupDeliveries, rng)
@@ -59,6 +72,32 @@ using SwarmPickupDeliveryProblem.Problems: TSP, PDP, Utils
 
             @test 0 < objective < 1
             @test objective ≈ expectedObj atol = 0.01
+        end
+    end
+
+    @testset "Test Multiple Pickup Delivery Problem" begin
+        numberOfPickupDeliveries = 10
+        numberOfVehicles = 4
+        mpdp = PDP.generateRandomMPDP(numberOfPickupDeliveries, numberOfVehicles, rng)
+
+        @testset "Test Random MPDP initialization" begin
+            numberOfCities = 2 * numberOfPickupDeliveries + 1
+
+            @test mpdp.numberOfPickupDeliveries == numberOfPickupDeliveries
+            @test mpdp.numberOfVehicles == numberOfVehicles
+            @test size(mpdp.distanceMatrix) == (numberOfCities, numberOfCities)
+            @test size(mpdp.P) == (numberOfPickupDeliveries,)
+            @test size(mpdp.D) == (numberOfPickupDeliveries,)
+        end
+
+        @testset "Test MPDP with one vehicle" begin
+            pdp = PDP.generateRandomPDP(numberOfPickupDeliveries, rng)
+            possibleSolution = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            vehicles = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+            objPDP = PDP.objFunction(possibleSolution, pdp)
+            objMPDP = PDP.objFunction(possibleSolution, vehicles, mpdp)
+
+            @test objMPDP ≈ objPDP atol = 0.01
         end
     end
 
