@@ -34,9 +34,9 @@ using SwarmPickupDeliveryProblem.Problems: TSP, PDP, Utils
         mtsp = TSP.generateRandomMTSP(numberOfCities, numberOfSalesmen, rng)
 
         @testset "Test Random MTSP initialization" begin
-            @test tsp.numberOfCities == numberOfCities
+            @test mtsp.numberOfCities == numberOfCities
             @test mtsp.numberOfSalesmen == numberOfSalesmen
-            @test size(tsp.distanceMatrix) == (numberOfCities, numberOfCities)
+            @test size(mtsp.distanceMatrix) == (numberOfCities, numberOfCities)
         end
 
     end
