@@ -20,7 +20,7 @@ function tournamentSelection!(
     objFunction::Function,
     rng::AbstractRNG,
 ) 
-    idxPop = sample(rng, 1:length(generation), 2, replace = false)
+    idxPop = sample(rng, 1:length(generation), 2, replace=false)
     fitness = [objFunction(generation[i]) for i in idxPop]
     push!(idxGenParents, idxPop[argmax(fitness)])
 end
