@@ -5,7 +5,7 @@ include("GeneticAlgorithm/GeneticAlgorithm.jl")
 include("Problems/Problems.jl")
 
 using .GeneticAlgorithm: geneticAlgorithm, Parameters
-using .Problems.MPDP: generateRandomMPDP
+using .Problems: PDP
 
 using Random: MersenneTwister, randperm
 using StatsBase: sample
@@ -28,10 +28,14 @@ function main()
     # Problem Definition
     numberOfPickupDeliveries = 10
     numberOfVehicles = 4
-    problem = generateRandomMPDP(numberOfPickupDeliveries, numberOfVehicles, rng)
+    problem = PDP.generateRandomMPDP(numberOfPickupDeliveries, numberOfVehicles, rng)
 
     # Genetic Algorithm Parameters
     parameters = Parameters(10, 100, 0.8, 0.2)
+
+    # Redefine Objective function
+    function objFunction(solution::Solution)
+        return PDP.objFunction(solution.cchromosome, solution.vchromosome, problem)
 
     # Initialization
     generationParent = initializeGeneration(
@@ -43,7 +47,7 @@ function main()
 
     # Execution
     bestGeneration =
-        geneticAlgorithm(generationParent, problem.objFunction, parameters, rng)
+        geneticAlgorithm(generationParent, objFunction, parameters, rng)
 
     # Output
     bestSolution = bestGeneration[1]

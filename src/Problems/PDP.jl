@@ -1,13 +1,9 @@
 module PDP
 
-export PickupDeliveryProblem, generateRandomPDP, objFunction, generateRandomMPDP, MultiplePickupDeliveryProblem
-
 include("./Utils.jl")
+
 import .Utils: DistanceMatrix, generateDistanceMatrix
-
 using Random: AbstractRNG, shuffle
-
-Solution = Vector{Int64}
 
 struct PickupDeliveryProblem
     numberOfPickupDeliveries::Int64
