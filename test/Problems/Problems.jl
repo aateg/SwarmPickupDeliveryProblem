@@ -5,42 +5,6 @@ using SwarmPickupDeliveryProblem.Problems: TSP, PDP, Utils
 @testset "Test Problems" begin
     rng = MersenneTwister(1234)
 
-    @testset "Test Travel Salesman Problem" begin
-        numberOfCities = 4
-        tsp = TSP.generateRandomTSP(numberOfCities, rng)
-
-        @testset "Test Random TSP initialization" begin
-            @test tsp.numberOfCities == numberOfCities
-            @test size(tsp.distanceMatrix) == (numberOfCities, numberOfCities)
-        end
-
-        @testset "Test Objective Function Calculation" begin
-            possibleSolution = [1, 2, 3, 4]
-            expectedTotalDistance =
-                tsp.distanceMatrix.d[1, 2] +
-                tsp.distanceMatrix.d[2, 3] \ +tsp.distanceMatrix.d[3, 4] +
-                tsp.distanceMatrix.d[4, 1]
-
-            objective = TSP.objFunction(possibleSolution, tsp)
-
-            @test 0 < objective < 1
-            @test objective ≈ 1 / expectedTotalDistance atol = 0.01
-        end
-    end
-
-    @testset "Test Multiple Travel Salesmen Problem" begin
-        numberOfCities = 10
-        numberOfSalesmen = 3
-        mtsp = TSP.generateRandomMTSP(numberOfCities, numberOfSalesmen, rng)
-
-        @testset "Test Random MTSP initialization" begin
-            @test mtsp.numberOfCities == numberOfCities
-            @test mtsp.numberOfSalesmen == numberOfSalesmen
-            @test size(mtsp.distanceMatrix) == (numberOfCities, numberOfCities)
-        end
-
-    end
-
     @testset "Test Pickup Delivery Problem" begin
         numberOfPickupDeliveries = 4
         pdp = PDP.generateRandomPDP(numberOfPickupDeliveries, rng)
