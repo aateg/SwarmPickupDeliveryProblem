@@ -1,12 +1,25 @@
 module SwarmPickupDeliveryProblem
 
-using Random: MersenneTwister
-
+include("GeneticAlgorithm/solution.jl")
 include("GeneticAlgorithm/GeneticAlgorithm.jl")
-using .GeneticAlgorithm: geneticAlgorithm, Config
-
 include("Problems/Problems.jl")
-using .Problems: TSP, PDP, Utils
+
+using .GeneticAlgorithm: geneticAlgorithm, Parameters
+using .Problems.MPDP: generateRandomMPDP
+
+using Random: MersenneTwister, randperm
+using StatsBase: sample
+
+function initializeGeneration(
+    numberOfPickupDeliveries::Int64,
+    numberOfVehicles::Int64,
+    populationSize::Int64,
+    rng::AbstractRNG,
+)
+    cchromo = randperm(rng, numberOfPickupDeliveries)
+    vchromo = sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace=true)
+    return collect(Solution(cchromo, vchromo) for i = 1:populationSize)
+end
 
 function main()
     # Random Number Generator
@@ -14,16 +27,25 @@ function main()
 
     # Problem Definition
     numberOfPickupDeliveries = 10
-    problem = generateRandomPDP(numberOfPickupDeliveries, rng)
+    numberOfVehicles = 4
+    problem = generateRandomMPDP(numberOfPickupDeliveries, numberOfVehicles, rng)
 
     # Genetic Algorithm Parameters
-    parameters = Config(10, 100, 0.8, 0.2)
+    parameters = Parameters(10, 100, 0.8, 0.2)
 
-    # execution
+    # Initialization
+    generationParent = initializeGeneration(
+        problem.numberOfPickupDeliveries,
+        problem.numberOfVehicles,
+        parameters.populationSize,
+        rng,
+    )
+
+    # Execution
     bestGeneration =
-        geneticAlgorithm(problem.encoding, problem.objFunction, parameters, rng)
+        geneticAlgorithm(generationParent, problem.objFunction, parameters, rng)
 
-    # output
+    # Output
     bestSolution = bestGeneration[1]
     println("Best solution: ", bestSolution)
 
