@@ -1,6 +1,7 @@
 module PDP
 
 include("./Utils.jl")
+include("../GeneticAlgorithm/solution.jl")
 
 import .Utils: DistanceMatrix, generateDistanceMatrix
 using Random: AbstractRNG, shuffle

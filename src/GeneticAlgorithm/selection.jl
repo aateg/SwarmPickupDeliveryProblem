@@ -1,4 +1,5 @@
 using StatsBase: Weights, sample
+using Random: AbstractRNG
 
 include("solution.jl")
 

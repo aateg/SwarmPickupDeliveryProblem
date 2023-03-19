@@ -3,8 +3,25 @@ module GeneticAlgorithm
 using Random: shuffle, AbstractRNG
 
 include("solution.jl")
+include("Operators.jl")
 
 import .Operators
+
+struct Parameters
+    populationSize::Int64
+    maxGenerations::Int64
+    pCross::Float64
+    pMutate::Float64
+
+    function parameters(
+        populationSize::Int64,
+        maxGenerations::Int64,
+        pCross::Float64,
+        pMutate::Float64,
+    )
+        new(populationSize, maxGenerations, pCross, pMutate)
+    end
+end
 
 function geneticAlgorithm(
     generationParent::Generation,
@@ -26,22 +43,6 @@ function geneticAlgorithm(
             sort([generationParent; offspring], by = objFunction, rev = true)[1:parameters.populationSize]
     end
     return generationParent
-end
-
-struct Parameters
-    populationSize::Int64
-    maxGenerations::Int64
-    pCross::Float64
-    pMutate::Float64
-
-    function parameters(
-        populationSize::Int64,
-        maxGenerations::Int64,
-        pCross::Float64,
-        pMutate::Float64,
-    )
-        new(populationSize, maxGenerations, pCross, pMutate)
-    end
 end
 
 end # module

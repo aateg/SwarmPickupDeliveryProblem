@@ -1,4 +1,5 @@
-using Random: AbstractRNG, sample
+using StatsBase: sample
+using Random: AbstractRNG
 
 include("solution.jl")
 

@@ -7,7 +7,7 @@ include("Problems/Problems.jl")
 using .GeneticAlgorithm: geneticAlgorithm, Parameters
 using .Problems: PDP
 
-using Random: MersenneTwister, randperm
+using Random: MersenneTwister, randperm, AbstractRNG
 using StatsBase: sample
 
 function initializeGeneration(
@@ -36,6 +36,7 @@ function main()
     # Redefine Objective function
     function objFunction(solution::Solution)
         return PDP.objFunction(solution.cchromosome, solution.vchromosome, problem)
+    end
 
     # Initialization
     generationParent = initializeGeneration(
@@ -52,7 +53,6 @@ function main()
     # Output
     bestSolution = bestGeneration[1]
     println("Best solution: ", bestSolution)
-
 end
 
 end # module

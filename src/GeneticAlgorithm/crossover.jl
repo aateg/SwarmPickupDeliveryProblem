@@ -1,4 +1,4 @@
-using Random: rand
+using Random: rand, AbstractRNG
 
 include("solution.jl")
 
