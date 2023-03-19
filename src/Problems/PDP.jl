@@ -59,7 +59,11 @@ function objFunction(x::Solution, pdp::PickupDeliveryProblem)
     return 1 / totalDistancePairedPickupDelivery(x, pdp.distanceMatrix.d, pdp.P, pdp.D)
 end
 
-function objFunction(cities::Vector{Int64}, vehicles::Vector{Int64}, mpdp::MultiplePickupDeliveryProblem)
+function objFunction(
+    cities::Vector{Int64},
+    vehicles::Vector{Int64},
+    mpdp::MultiplePickupDeliveryProblem,
+)
     # Create a dictionary of salesman to cities
     vehiclesCities = Dict()
     for (idx, vehicle) in enumerate(vehicles)
@@ -73,7 +77,12 @@ function objFunction(cities::Vector{Int64}, vehicles::Vector{Int64}, mpdp::Multi
     # Compute the total distance
     t = 0
     for vehicle in keys(vehiclesCities)
-        t += totalDistancePairedPickupDelivery(vehiclesCities[vehicle], mpdp.distanceMatrix.d, mpdp.P, mpdp.D)
+        t += totalDistancePairedPickupDelivery(
+            vehiclesCities[vehicle],
+            mpdp.distanceMatrix.d,
+            mpdp.P,
+            mpdp.D,
+        )
     end
     return 1 / t
 end
@@ -87,13 +96,23 @@ function generateRandomPDP(numberOfPickupDeliveries::Int64, rng::AbstractRNG)
     return PickupDeliveryProblem(numberOfPickupDeliveries, distanceMatrix, P, D)
 end
 
-function generateRandomMPDP(numberOfPickupDeliveries::Int64, numberOfVehicles::Int64, rng::AbstractRNG)
+function generateRandomMPDP(
+    numberOfPickupDeliveries::Int64,
+    numberOfVehicles::Int64,
+    rng::AbstractRNG,
+)
     numberOfCities = 2 * numberOfPickupDeliveries + 1 # depot is the last one
     distanceMatrix = generateDistanceMatrix(numberOfCities, rng) # depot at the N+1 position
     PandD = shuffle(rng, 1:numberOfCities-1) # exclude the depot
     P = PandD[1:numberOfPickupDeliveries]
     D = PandD[numberOfPickupDeliveries+1:numberOfCities-1]
-    return MultiplePickupDeliveryProblem(numberOfPickupDeliveries, numberOfVehicles, distanceMatrix, P, D)
+    return MultiplePickupDeliveryProblem(
+        numberOfPickupDeliveries,
+        numberOfVehicles,
+        distanceMatrix,
+        P,
+        D,
+    )
 end
 
 end # module

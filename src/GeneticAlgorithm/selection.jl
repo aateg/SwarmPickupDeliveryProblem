@@ -20,8 +20,8 @@ function tournamentSelection!(
     generation::Generation,
     objFunction::Function,
     rng::AbstractRNG,
-) 
-    idxPop = sample(rng, 1:length(generation), 2, replace=false)
+)
+    idxPop = sample(rng, 1:length(generation), 2, replace = false)
     fitness = [objFunction(generation[i]) for i in idxPop]
     push!(idxGenParents, idxPop[argmax(fitness)])
 end
@@ -47,7 +47,7 @@ function rouletteWheelSelection!(
     rng::AbstractRNG,
 )
     weights = Weights(fitness ./ sum(fitness))
-    idxParents = sample(rng, 1:length(generation), weights, 2, replace=false)
+    idxParents = sample(rng, 1:length(generation), weights, 2, replace = false)
     push!(idxGenParents, idxParents[1])
     push!(idxGenParents, idxParents[2])
 end

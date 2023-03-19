@@ -34,8 +34,12 @@ function geneticAlgorithm(
         idxGenerationParent =
             Operators.rouletteWheelSelection(generationParent, objFunction, rng)
         # Crossover
-        offspring =
-            Operators.crossover(idxGenerationParent, generationParent, parameters.pCross, rng)
+        offspring = Operators.crossover(
+            idxGenerationParent,
+            generationParent,
+            parameters.pCross,
+            rng,
+        )
         # Mutation
         Operators.mutate!(offspring, parameters.pMutate, rng)
         # Selection of the fittest

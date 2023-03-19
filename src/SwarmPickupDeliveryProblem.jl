@@ -17,7 +17,7 @@ function initializeGeneration(
     rng::AbstractRNG,
 )
     cchromo = randperm(rng, numberOfPickupDeliveries)
-    vchromo = sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace=true)
+    vchromo = sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true)
     return collect(Solution(cchromo, vchromo) for i = 1:populationSize)
 end
 
@@ -47,8 +47,7 @@ function main()
     )
 
     # Execution
-    bestGeneration =
-        geneticAlgorithm(generationParent, objFunction, parameters, rng)
+    bestGeneration = geneticAlgorithm(generationParent, objFunction, parameters, rng)
 
     # Output
     bestSolution = bestGeneration[1]

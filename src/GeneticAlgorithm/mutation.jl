@@ -13,6 +13,8 @@ end
 
 function mutate!(solution::Solution, rng::AbstractRNG)
     idx1, idx2 = sample(rng, 1:length(chromosome), 2, replace = false)
-    solution.cchromo[idx1], solution.cchromo[idx2] = solution.cchromo[idx2], solution.cchromo[idx1]
-    solution.vchromo[idx1], solution.vchromo[idx2] = solution.vchromo[idx2], solution.vchromo[idx1]
+    solution.cchromo[idx1], solution.cchromo[idx2] =
+        solution.cchromo[idx2], solution.cchromo[idx1]
+    solution.vchromo[idx1], solution.vchromo[idx2] =
+        solution.vchromo[idx2], solution.vchromo[idx1]
 end
