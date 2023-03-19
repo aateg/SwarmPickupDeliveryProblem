@@ -2,10 +2,11 @@ module GeneticAlgorithm
 
 using Random: shuffle, AbstractRNG
 
-include("solution.jl")
+include("../Solution.jl")
 include("Operators.jl")
 
 import .Operators
+import .Solution: GeneticSolution, Generation
 
 struct Parameters
     populationSize::Int64
@@ -13,7 +14,7 @@ struct Parameters
     pCross::Float64
     pMutate::Float64
 
-    function parameters(
+    function Parameters(
         populationSize::Int64,
         maxGenerations::Int64,
         pCross::Float64,

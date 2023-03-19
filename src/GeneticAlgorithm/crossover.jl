@@ -1,6 +1,7 @@
 using Random: rand, AbstractRNG
 
-include("solution.jl")
+include("../Solution.jl")
+import .Solution: GeneticSolution, Generation
 
 function crossover(
     idxGenerationParent::Vector{Int},
@@ -21,8 +22,8 @@ function crossover(
 end
 
 function pmxCrossover(
-    solution::Solution,
-    other::Solution,
+    solution::GeneticSolution,
+    other::GeneticSolution,
     maxCrossLen::Float64,
     rng::AbstractRNG,
 )
@@ -52,5 +53,5 @@ function pmxCrossover(
     # cross the material
     newVchromosome[start:start+len-1] = other[start:start+len-1]
 
-    return Solution(newCchromosome, newVchromosome)
+    return GeneticSolution(newCchromosome, newVchromosome)
 end

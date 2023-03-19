@@ -1,7 +1,8 @@
 using StatsBase: Weights, sample
 using Random: AbstractRNG
 
-include("solution.jl")
+include("../Solution.jl")
+import .Solution: Generation
 
 function tournamentSelection(
     generation::Generation,

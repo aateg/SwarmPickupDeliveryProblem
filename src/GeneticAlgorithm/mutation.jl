@@ -1,7 +1,8 @@
 using StatsBase: sample
 using Random: AbstractRNG
 
-include("solution.jl")
+include("../Solution.jl")
+import .Solution: GeneticSolution, Generation
 
 function mutate!(generation::Generation, pMutate::Float64, rng::AbstractRNG)
     for solution in generation
@@ -11,7 +12,7 @@ function mutate!(generation::Generation, pMutate::Float64, rng::AbstractRNG)
     end
 end
 
-function mutate!(solution::Solution, rng::AbstractRNG)
+function mutate!(solution::GeneticSolution, rng::AbstractRNG)
     idx1, idx2 = sample(rng, 1:length(chromosome), 2, replace = false)
     solution.cchromo[idx1], solution.cchromo[idx2] =
         solution.cchromo[idx2], solution.cchromo[idx1]

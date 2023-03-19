@@ -1,8 +1,9 @@
 module PDP
 
 include("./Utils.jl")
-include("../GeneticAlgorithm/solution.jl")
+include("../Solution.jl")
 
+import .Solution: GeneticSolution
 import .Utils: DistanceMatrix, generateDistanceMatrix
 using Random: AbstractRNG, shuffle
 
@@ -41,7 +42,7 @@ struct MultiplePickupDeliveryProblem
 end
 
 function totalDistancePairedPickupDelivery(
-    x::Solution,
+    x::GeneticSolution,
     dist::Matrix{Float64},
     P::Vector{Int64},
     D::Vector{Int64},
@@ -55,7 +56,7 @@ function totalDistancePairedPickupDelivery(
     return s
 end
 
-function objFunction(x::Solution, pdp::PickupDeliveryProblem)
+function objFunction(x::GeneticSolution, pdp::PickupDeliveryProblem)
     return 1 / totalDistancePairedPickupDelivery(x, pdp.distanceMatrix.d, pdp.P, pdp.D)
 end
 
