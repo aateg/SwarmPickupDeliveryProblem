@@ -1,12 +1,12 @@
 module SwarmPickupDeliveryProblem
 
-include("Solution.jl")
 include("GeneticAlgorithm/GeneticAlgorithm.jl")
+include("GeneticAlgorithm/GeneticSolution.jl")
 include("Problems/Problems.jl")
 
 using .GeneticAlgorithm: geneticAlgorithm, Parameters
 using .Problems: PDP
-using .Solution: GeneticSolution
+using .GeneticSolution: Solution
 
 using Random: MersenneTwister, randperm, AbstractRNG
 using StatsBase: sample
@@ -19,7 +19,7 @@ function initializeGeneration(
 )
     cchromo = randperm(rng, numberOfPickupDeliveries)
     vchromo = sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true)
-    return collect(GeneticSolution(cchromo, vchromo) for i = 1:populationSize)
+    return collect(Solution(cchromo, vchromo) for i = 1:populationSize)
 end
 
 function main()
@@ -35,7 +35,7 @@ function main()
     parameters = Parameters(10, 100, 0.8, 0.2)
 
     # Redefine Objective function
-    function objFunction(solution::GeneticSolution)
+    function objFunction(solution::Solution)
         return PDP.objFunction(solution.cchromosome, solution.vchromosome, problem)
     end
 
@@ -48,10 +48,10 @@ function main()
     )
 
     # Execution
-    bestGeneration = geneticAlgorithm(generationParent, objFunction, parameters, rng)
+    geneticAlgorithm!(generationParent, objFunction, parameters, rng)
 
     # Output
-    bestSolution = bestGeneration[1]
+    bestSolution = generationParent[1]
     println("Best solution: ", bestSolution)
 end
 

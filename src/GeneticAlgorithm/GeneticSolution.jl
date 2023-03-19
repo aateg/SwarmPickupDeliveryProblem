@@ -1,29 +1,18 @@
+module GeneticSolution
+
+using StatsBase: sample
 using Random: rand, AbstractRNG
 
-include("../Solution.jl")
-import .Solution: GeneticSolution, Generation
-
-function crossover(
-    idxGenerationParent::Vector{Int},
-    generationParent::Generation,
-    pCross::Float64,
-    rng::AbstractRNG,
-)
-    # get two on two combinations of chromosomes for population
-    # and perform crossover
-    N = length(idxGenerationParent)
-    offspring = Vector{Int}[]
-    for i = 1:2:N-1
-        j = i + 1
-        c1 = pmxCrossover(generationParent[i], generationParent[j], pCross, rng)
-        push!(offspring, c1)
-    end
-    return offspring
+struct Solution
+    cchromosome::Vector{Int64}
+    vchromosome::Vector{Int64}
 end
 
-function pmxCrossover(
-    solution::GeneticSolution,
-    other::GeneticSolution,
+# Crossover --------------------------------------------------
+# PMX Crossover
+function crossover(
+    solution::Solution,
+    other::Solution,
     maxCrossLen::Float64,
     rng::AbstractRNG,
 )
@@ -53,5 +42,17 @@ function pmxCrossover(
     # cross the material
     newVchromosome[start:start+len-1] = other[start:start+len-1]
 
-    return GeneticSolution(newCchromosome, newVchromosome)
+    return Solution(newCchromosome, newVchromosome)
 end
+
+# Mutation ---------------------------------------------------
+
+function mutate!(solution::Solution, rng::AbstractRNG)
+    idx1, idx2 = sample(rng, 1:length(chromosome), 2, replace = false)
+    solution.cchromo[idx1], solution.cchromo[idx2] =
+        solution.cchromo[idx2], solution.cchromo[idx1]
+    solution.vchromo[idx1], solution.vchromo[idx2] =
+        solution.vchromo[idx2], solution.vchromo[idx1]
+end
+
+end # module
