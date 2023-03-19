@@ -1,19 +1,19 @@
 module GeneticAlgorithm
 
-export geneticAlgorithm, Config
-
 using Random: shuffle, AbstractRNG
 
+include("solution.jl")
 include("Operators.jl")
+
 import .Operators
 
-struct Config
+struct Parameters
     populationSize::Int64
     maxGenerations::Int64
     pCross::Float64
     pMutate::Float64
 
-    function Config(
+    function parameters(
         populationSize::Int64,
         maxGenerations::Int64,
         pCross::Float64,
@@ -23,35 +23,28 @@ struct Config
     end
 end
 
-function initializeGeneration(
-    solEncoding::Vector{Int64},
-    populationSize::Int64,
-    rng::AbstractRNG,
-)
-    return collect(shuffle(rng, solEncoding) for i = 1:populationSize)
-end
-
 function geneticAlgorithm(
-    solEncoding::Vector{Int64},
+    generationParent::Generation,
     objFunction::Function,
-    config::Config,
+    parameters::Parameters,
     rng::AbstractRNG,
 )
-    # Initialize the population
-    generationParent = initializeGeneration(solEncoding, config.populationSize, rng)
-
-    for _ = 1:config.maxGenerations
+    for _ = 1:parameters.maxGenerations
         # Select the parents to be mated
         idxGenerationParent =
             Operators.rouletteWheelSelection(generationParent, objFunction, rng)
         # Crossover
-        offspring =
-            Operators.crossover(idxGenerationParent, generationParent, config.pCross, rng)
+        offspring = Operators.crossover(
+            idxGenerationParent,
+            generationParent,
+            parameters.pCross,
+            rng,
+        )
         # Mutation
-        Operators.mutate!(offspring, config.pMutate, rng)
+        Operators.mutate!(offspring, parameters.pMutate, rng)
         # Selection of the fittest
         generationParent =
-            sort([generationParent; offspring], by = objFunction, rev = true)[1:config.populationSize]
+            sort([generationParent; offspring], by = objFunction, rev = true)[1:parameters.populationSize]
     end
     return generationParent
 end
