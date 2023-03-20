@@ -5,7 +5,9 @@ using Random: AbstractRNG, shuffle
 include("Utils.jl")
 using .Utils: DistanceMatrix, generateDistanceMatrix
 
-struct PickupDeliveryProblem
+abstract type Problem end
+
+struct PickupDeliveryProblem <: Problem
     numberOfPickupDeliveries::Int64
     distanceMatrix::DistanceMatrix
     P::Vector{Int64} # pickup locations
@@ -52,7 +54,7 @@ end
 
 # Multiple Pickup Delivery Problem ------------------------------------------------------------
 
-struct MultiplePickupDeliveryProblem
+struct MultiplePickupDeliveryProblem <: Problem
     numberOfPickupDeliveries::Int64
     numberOfVehicles::Int64
     distanceMatrix::DistanceMatrix
@@ -96,6 +98,17 @@ function objFunction(
         )
     end
     return 1 / t
+end
+
+function summary(problem::Problem)
+    println("Multiple Pickup Delivery Problem")
+    println("- Problem Type: Paired")
+    println("- Problem Total Size: ", 2 * problem.numberOfPickupDeliveries + 1)
+    println("- Number of Pickups: ", problem.numberOfPickupDeliveries)
+    println("- Number of Vehicles: ", problem.numberOfVehicles)
+    println("- Pickups: ", problem.P)
+    println("- Deliveries: ", problem.D)
+    println("\n")
 end
 
 function generateRandomMPDP(
