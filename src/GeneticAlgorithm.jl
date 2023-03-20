@@ -34,15 +34,9 @@ function geneticAlgorithm!(
 )
     for _ = 1:parameters.maxGenerations
         # Select the parents to be mated
-        idxGenerationParent =
-            rouletteWheelSelection(generationParent, objFunction, rng)
+        idxGenerationParent = rouletteWheelSelection(generationParent, objFunction, rng)
         # Crossover
-        offspring = crossover(
-            idxGenerationParent,
-            generationParent,
-            parameters.pCross,
-            rng,
-        )
+        offspring = crossover(idxGenerationParent, generationParent, parameters.pCross, rng)
         # Mutation
         mutate!(offspring, parameters.pMutate, rng)
         # Selection of the fittest
@@ -99,7 +93,8 @@ function crossover(
     offspring = Solution[]
     for i = 1:2:N-1
         j = i + 1
-        c1 = GeneticSolution.crossover(generationParent[i], generationParent[j], pCross, rng)
+        c1 =
+            GeneticSolution.crossover(generationParent[i], generationParent[j], pCross, rng)
         push!(offspring, c1)
     end
     return offspring

@@ -43,7 +43,8 @@ function main()
     )
 
     # Redefine Objective function
-    fitnessFunction(solution::Solution) = PDP.objFunction(solution.cchromosome, solution.vchromosome, problem)
+    fitnessFunction(solution::Solution) =
+        PDP.objFunction(solution.cchromosome, solution.vchromosome, problem)
 
     # Execution
     geneticAlgorithm!(generationParent, fitnessFunction, parameters, rng)

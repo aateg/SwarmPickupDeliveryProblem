@@ -37,7 +37,8 @@ function totalDistancePairedSinglePickupDelivery(
 end
 
 function objFunction(x::Vector{Int64}, pdp::PickupDeliveryProblem)
-    return 1 / totalDistancePairedSinglePickupDelivery(x, pdp.distanceMatrix.d, pdp.P, pdp.D)
+    return 1 /
+           totalDistancePairedSinglePickupDelivery(x, pdp.distanceMatrix.d, pdp.P, pdp.D)
 end
 
 function generateRandomPDP(numberOfPickupDeliveries::Int64, rng::AbstractRNG)
@@ -75,7 +76,7 @@ function objFunction(
     mpdp::MultiplePickupDeliveryProblem,
 )
     # Create a dictionary of salesman to cities
-    vehiclesCities = Dict{Int64, Vector{Int64}}()
+    vehiclesCities = Dict{Int64,Vector{Int64}}()
     for (idx, vehicle) in enumerate(vehicles)
         if !haskey(vehiclesCities, vehicle)
             vehiclesCities[vehicle] = [cities[idx]]

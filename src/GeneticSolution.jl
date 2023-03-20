@@ -50,7 +50,7 @@ end
 # Mutation ---------------------------------------------------
 
 function mutate!(solution::Solution, rng::AbstractRNG)
-    idx1, idx2 = sample(rng, 1:length(solution.cchromosome), 2, replace=false)
+    idx1, idx2 = sample(rng, 1:length(solution.cchromosome), 2, replace = false)
     solution.cchromosome[idx1], solution.cchromosome[idx2] =
         solution.cchromosome[idx2], solution.cchromosome[idx1]
     solution.vchromosome[idx1], solution.vchromosome[idx2] =
