@@ -53,8 +53,10 @@ function main()
     geneticAlgorithm!(generationParent, fitnessFunction, parameters, rng)
 
     # Output
-    bestSolution = generationParent[1]
-    println("Best solution: ", bestSolution)
+    println("Best solution: ", generationParent[1])
+    println("Second Best solution: ", generationParent[2])
+
+
 end
 main()
 
