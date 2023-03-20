@@ -27,10 +27,10 @@ function crossover(
     start = floor(Int, rand(rng, 1:(N-len)))     # starting index of the crossover section
 
     # cross the material
-    newCchromosome[start:start+len-1] = other[start:start+len-1]
+    newCchromosome[start:start+len-1] = other.cchromosome[start:start+len-1]
 
     idx = 1
-    for x in chromosome
+    for x in solution.cchromosome
         if start <= idx < start + len
             idx = start + len
         end
@@ -42,7 +42,7 @@ function crossover(
     end
 
     # cross the material
-    newVchromosome[start:start+len-1] = other[start:start+len-1]
+    newVchromosome[start:start+len-1] = other.vchromosome[start:start+len-1]
 
     return Solution(newCchromosome, newVchromosome)
 end
@@ -50,11 +50,11 @@ end
 # Mutation ---------------------------------------------------
 
 function mutate!(solution::Solution, rng::AbstractRNG)
-    idx1, idx2 = sample(rng, 1:length(chromosome), 2, replace = false)
-    solution.cchromo[idx1], solution.cchromo[idx2] =
-        solution.cchromo[idx2], solution.cchromo[idx1]
-    solution.vchromo[idx1], solution.vchromo[idx2] =
-        solution.vchromo[idx2], solution.vchromo[idx1]
+    idx1, idx2 = sample(rng, 1:length(solution.cchromosome), 2, replace=false)
+    solution.cchromosome[idx1], solution.cchromosome[idx2] =
+        solution.cchromosome[idx2], solution.cchromosome[idx1]
+    solution.vchromosome[idx1], solution.vchromosome[idx2] =
+        solution.vchromosome[idx2], solution.vchromosome[idx1]
 end
 
 end # module

@@ -96,7 +96,7 @@ function crossover(
     # get two on two combinations of chromosomes for population
     # and perform crossover
     N = length(idxGenerationParent)
-    offspring = Vector{Int}[]
+    offspring = Solution[]
     for i = 1:2:N-1
         j = i + 1
         c1 = GeneticSolution.crossover(generationParent[i], generationParent[j], pCross, rng)
