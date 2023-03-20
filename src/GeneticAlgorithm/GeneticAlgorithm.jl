@@ -1,10 +1,12 @@
 module GeneticAlgorithm
 
+export geneticAlgorithm!, Parameters
+
 using Random: shuffle, AbstractRNG
 using StatsBase: Weights, sample
 
 include("GeneticSolution.jl")
-using .GeneticSolution
+using .GeneticSolution: Solution
 
 Generation = Vector{Solution}
 

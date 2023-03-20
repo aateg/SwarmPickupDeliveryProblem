@@ -1,5 +1,7 @@
 module GeneticSolution
 
+export Solution, crossover, mutate!
+
 using StatsBase: sample
 using Random: rand, AbstractRNG
 

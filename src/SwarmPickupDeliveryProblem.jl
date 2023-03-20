@@ -1,15 +1,15 @@
 module SwarmPickupDeliveryProblem
 
+using Random: MersenneTwister, randperm, AbstractRNG
+using StatsBase: sample
+
 include("GeneticAlgorithm/GeneticAlgorithm.jl")
 include("GeneticAlgorithm/GeneticSolution.jl")
 include("Problems/Problems.jl")
 
-using .GeneticAlgorithm: geneticAlgorithm, Parameters
-using .Problems: PDP
+using .GeneticAlgorithm: geneticAlgorithm!, Parameters
 using .GeneticSolution: Solution
-
-using Random: MersenneTwister, randperm, AbstractRNG
-using StatsBase: sample
+import .Problems.PDP
 
 function initializeGeneration(
     numberOfPickupDeliveries::Int64,
