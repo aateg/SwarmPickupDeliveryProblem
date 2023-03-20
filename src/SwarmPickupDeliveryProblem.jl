@@ -15,9 +15,11 @@ function initializeGeneration(
     populationSize::Int64,
     rng::AbstractRNG,
 )
-    cchromo = randperm(rng, numberOfPickupDeliveries)
-    vchromo = sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true)
-    return collect(Solution(cchromo, vchromo) for i = 1:populationSize)
+    return collect(
+        Solution(
+            randperm(rng, numberOfPickupDeliveries), # cchromosome
+            sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace=true) # vchromosome
+        ) for i = 1:populationSize)
 end
 
 
