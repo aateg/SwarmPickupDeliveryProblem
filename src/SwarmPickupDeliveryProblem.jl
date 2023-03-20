@@ -29,11 +29,14 @@ function summary(solution::Solution, problem::PDP.Problem)
     println("Solution:")
     println("- Chromosome: ", solution.cchromosome)
     println("- Vehicles: ", solution.vchromosome)
-    println("- Total Distance: ", 1/PDP.objFunction(solution.cchromosome, solution.vchromosome, problem))
+    println(
+        "- Total Distance: ",
+        1 / PDP.objFunction(solution.cchromosome, solution.vchromosome, problem),
+    )
     println("\n")
     println("Routes:")
-    for vehicle in 1:problem.numberOfVehicles
-        visits = solution.cchromosome[solution.vchromosome .== vehicle]
+    for vehicle = 1:problem.numberOfVehicles
+        visits = solution.cchromosome[solution.vchromosome.==vehicle]
         cities = [0; [(problem.P[visit], problem.D[visit]) for visit in visits]; 0]
         println("- Vehicle $vehicle: ", cities)
     end
