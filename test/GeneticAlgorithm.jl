@@ -1,4 +1,4 @@
-import SwarmPickupDeliveryProblem: Parameters
+import SwarmPickupDeliveryProblem.GeneticAlgorithm
 
 @testset "Test Genetic Algorithm" begin
     @testset "Test Initialize Population" begin

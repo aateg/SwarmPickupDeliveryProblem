@@ -1,6 +1,7 @@
 using Random: MersenneTwister
 
-using SwarmPickupDeliveryProblem.Problems: PDP, Utils
+import SwarmPickupDeliveryProblem.PDP
+import SwarmPickupDeliveryProblem.PDP.Utils
 
 @testset "Test Problems" begin
     rng = MersenneTwister(1234)

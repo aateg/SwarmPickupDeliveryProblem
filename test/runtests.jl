@@ -1,7 +1,6 @@
 using Test
 
 @testset "Test SwarmPickupDeliveryProblem" begin
-    include("Problems/Problems.jl")
-    include("GeneticAlgorithm/Operators.jl")
-    include("GeneticAlgorithm/GeneticAlgorithm.jl")
+    include("Problems.jl")
+    include("GeneticAlgorithm.jl")
 end
