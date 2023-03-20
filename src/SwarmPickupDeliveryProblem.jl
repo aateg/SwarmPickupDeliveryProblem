@@ -15,9 +15,12 @@ function initializeGeneration(
     populationSize::Int64,
     rng::AbstractRNG,
 )
-    cchromo = randperm(rng, numberOfPickupDeliveries)
-    vchromo = sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true)
-    return collect(Solution(cchromo, vchromo) for i = 1:populationSize)
+    return collect(
+        Solution(
+            randperm(rng, numberOfPickupDeliveries), # cchromosome
+            sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true), # vchromosome
+        ) for i = 1:populationSize
+    )
 end
 
 
@@ -50,8 +53,10 @@ function main()
     geneticAlgorithm!(generationParent, fitnessFunction, parameters, rng)
 
     # Output
-    bestSolution = generationParent[1]
-    println("Best solution: ", bestSolution)
+    println("Best solution: ", generationParent[1])
+    println("Second Best solution: ", generationParent[2])
+
+
 end
 main()
 
