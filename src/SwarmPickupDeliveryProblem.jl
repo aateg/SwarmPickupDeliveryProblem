@@ -6,7 +6,7 @@ using StatsBase: sample
 include("GeneticAlgorithm.jl")
 include("MultiplePickupDeliveryProblem.jl")
 
-using .GeneticAlgorithm: geneticAlgorithm!, Parameters, Solution
+using .GeneticAlgorithm: geneticAlgorithm, Parameters, Solution
 using .MultiplePickupDeliveryProblem: Problem, objFunction, generateRandomMPDP, printProblem
 
 function initializeGeneration(
@@ -30,10 +30,9 @@ function printSolution(solution::Solution, problem::Problem)
     println("Solution:")
     println("- Chromosome: ", solution.cchromosome)
     println("- Vehicles: ", solution.vchromosome)
-    println(
-        "- Total Distance: ",
-        1 / objFunction(solution.cchromosome, solution.vchromosome, problem),
-    )
+    cost = objFunction(solution.cchromosome, solution.vchromosome, problem)
+    println("- Total Distance: ", 1 / cost)
+    println("Cost: ", cost)
     println("Routes:")
     for vehicle = 1:problem.numberOfVehicles
         visits = solution.cchromosome[solution.vchromosome.==vehicle]
@@ -74,11 +73,11 @@ function main()
         objFunction(solution.cchromosome, solution.vchromosome, problem)
 
     # Execution
-    geneticAlgorithm!(generationParent, fitnessFunction, parameters, rng)
+    generationParent = geneticAlgorithm(generationParent, fitnessFunction, parameters, rng)
 
     # Output
     printSolution(generationParent[1], problem)
-    printSolution(generationParent[2], problem)
+    printSolution(generationParent[end], problem)
 
 end
 main()

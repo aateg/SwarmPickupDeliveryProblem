@@ -1,6 +1,6 @@
 module GeneticAlgorithm
 
-export geneticAlgorithm!, Parameters, Solution
+export geneticAlgorithm, Parameters, Solution
 
 using Random: shuffle, AbstractRNG
 using StatsBase: Weights, sample
@@ -26,7 +26,7 @@ struct Parameters
     end
 end
 
-function geneticAlgorithm!(
+function geneticAlgorithm(
     generationParent::Generation,
     objFunction::Function,
     parameters::Parameters,
