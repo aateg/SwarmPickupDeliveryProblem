@@ -4,10 +4,10 @@ using Random: MersenneTwister, randperm, AbstractRNG
 using StatsBase: sample
 
 include("GeneticAlgorithm.jl")
-include("PDP.jl")
+include("MultiplePickupDeliveryProblem.jl")
 
 using .GeneticAlgorithm: geneticAlgorithm!, Parameters, Solution
-import .PDP
+using .MultiplePickupDeliveryProblem: Problem, objFunction, generateRandomMPDP, summary
 
 function initializeGeneration(
     numberOfPickupDeliveries::Int64,
@@ -23,7 +23,7 @@ function initializeGeneration(
     )
 end
 
-function summary(solution::Solution, problem::PDP.Problem)
+function summary(solution::Solution, problem::Problem)
     # for each vehicle I want to know the cities it visits
     # and compute the total distance
     println("Solution:")
@@ -31,7 +31,7 @@ function summary(solution::Solution, problem::PDP.Problem)
     println("- Vehicles: ", solution.vchromosome)
     println(
         "- Total Distance: ",
-        1 / PDP.objFunction(solution.cchromosome, solution.vchromosome, problem),
+        1 / objFunction(solution.cchromosome, solution.vchromosome, problem),
     )
     println("\n")
     println("Routes:")
@@ -50,8 +50,9 @@ function main()
     # Problem Definition
     numberOfPickupDeliveries = 10
     numberOfVehicles = 4
-    problem = PDP.generateRandomMPDP(numberOfPickupDeliveries, numberOfVehicles, rng)
-    PDP.summary(problem)
+    problem = generateRandomMPDP(numberOfPickupDeliveries, numberOfVehicles, rng)
+    summary(problem)
+
     # Genetic Algorithm Parameters
     parameters = Parameters(10, 100, 0.8, 0.2)
 
@@ -65,7 +66,7 @@ function main()
 
     # Redefine Objective function
     fitnessFunction(solution::Solution) =
-        PDP.objFunction(solution.cchromosome, solution.vchromosome, problem)
+        objFunction(solution.cchromosome, solution.vchromosome, problem)
 
     # Execution
     geneticAlgorithm!(generationParent, fitnessFunction, parameters, rng)
