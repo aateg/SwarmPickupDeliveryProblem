@@ -18,8 +18,9 @@ function initializeGeneration(
     return collect(
         Solution(
             randperm(rng, numberOfPickupDeliveries), # cchromosome
-            sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace=true) # vchromosome
-        ) for i = 1:populationSize)
+            sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true), # vchromosome
+        ) for i = 1:populationSize
+    )
 end
 
 
