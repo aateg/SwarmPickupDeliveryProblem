@@ -1,6 +1,6 @@
 module MultiplePickupDeliveryProblem
 
-export Problem, objFunction, totalDistancePairedSinglePickupDelivery, generateRandomMPDP
+export Problem, objFunction, totalDistancePairedSinglePickupDelivery, generateRandomMPDP, printProblem
 
 using Random: AbstractRNG, shuffle
 
@@ -79,7 +79,7 @@ function generateRandomMPDP(
     )
 end
 
-function summary(problem::Problem)
+function printProblem(problem::Problem)
     println("Problem:")
     println("- Number of Pickup/Delivery: ", problem.numberOfPickupDeliveries)
     println("- Number of Vehicles: ", problem.numberOfVehicles)
