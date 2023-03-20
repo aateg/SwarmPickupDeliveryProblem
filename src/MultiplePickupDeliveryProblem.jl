@@ -1,6 +1,7 @@
 module MultiplePickupDeliveryProblem
 
-export Problem, objFunction, totalDistancePairedSinglePickupDelivery, generateRandomMPDP, printProblem
+export Problem,
+    objFunction, totalDistancePairedSinglePickupDelivery, generateRandomMPDP, printProblem
 
 using Random: AbstractRNG, shuffle
 
@@ -25,21 +26,17 @@ struct Problem
     end
 end
 
-function objFunction(
-    cities::Vector{Int64},
-    vehicles::Vector{Int64},
-    problem::Problem,
-)
+function objFunction(cities::Vector{Int64}, vehicles::Vector{Int64}, problem::Problem)
     t = 0
-    for vehicle in 1:problem.numberOfVehicles
+    for vehicle = 1:problem.numberOfVehicles
         tour = cities[vehicles.==vehicle]
         if length(tour) != 0
             t += totalDistancePairedSinglePickupDelivery(
-            tour,
-            problem.distanceMatrix.d,
-            problem.P,
-            problem.D,
-        )
+                tour,
+                problem.distanceMatrix.d,
+                problem.P,
+                problem.D,
+            )
         end
     end
     return 1 / t
@@ -70,13 +67,7 @@ function generateRandomMPDP(
     PandD = shuffle(rng, 1:numberOfCities-1) # exclude the depot
     P = PandD[1:numberOfPickupDeliveries]
     D = PandD[numberOfPickupDeliveries+1:numberOfCities-1]
-    return Problem(
-        numberOfPickupDeliveries,
-        numberOfVehicles,
-        distanceMatrix,
-        P,
-        D,
-    )
+    return Problem(numberOfPickupDeliveries, numberOfVehicles, distanceMatrix, P, D)
 end
 
 function printProblem(problem::Problem)

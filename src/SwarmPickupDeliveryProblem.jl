@@ -26,6 +26,7 @@ end
 function printSolution(solution::Solution, problem::Problem)
     # for each vehicle I want to know the cities it visits
     # and compute the total distance
+    println("\n")
     println("Solution:")
     println("- Chromosome: ", solution.cchromosome)
     println("- Vehicles: ", solution.vchromosome)
@@ -33,7 +34,6 @@ function printSolution(solution::Solution, problem::Problem)
         "- Total Distance: ",
         1 / objFunction(solution.cchromosome, solution.vchromosome, problem),
     )
-    println("\n")
     println("Routes:")
     for vehicle = 1:problem.numberOfVehicles
         visits = solution.cchromosome[solution.vchromosome.==vehicle]
@@ -44,9 +44,8 @@ function printSolution(solution::Solution, problem::Problem)
             push!(s, problem.D[visit])
         end
         push!(s, 0)
-        println("- Vehicle $vehicle: ", cities)
+        println("- Vehicle $vehicle: ", s)
     end
-    println("\n")
 end
 
 function main()
