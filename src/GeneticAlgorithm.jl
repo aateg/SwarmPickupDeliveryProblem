@@ -1,6 +1,6 @@
 module GeneticAlgorithm
 
-export geneticAlgorithm!, Parameters
+export geneticAlgorithm!, Parameters, Solution
 
 using Random: shuffle, AbstractRNG
 using StatsBase: Weights, sample
