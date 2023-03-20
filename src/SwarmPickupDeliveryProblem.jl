@@ -23,7 +23,22 @@ function initializeGeneration(
     )
 end
 
-
+function summary(solution::Solution, problem::PDP.Problem)
+    # for each vehicle I want to know the cities it visits
+    # and compute the total distance
+    println("Solution:")
+    println("- Chromosome: ", solution.cchromosome)
+    println("- Vehicles: ", solution.vchromosome)
+    println("- Total Distance: ", 1/PDP.objFunction(solution.cchromosome, solution.vchromosome, problem))
+    println("\n")
+    println("Routes:")
+    for vehicle in 1:problem.numberOfVehicles
+        visits = solution.cchromosome[solution.vchromosome .== vehicle]
+        cities = [0; [(problem.P[visit], problem.D[visit]) for visit in visits]; 0]
+        println("- Vehicle $vehicle: ", cities)
+    end
+    println("\n")
+end
 
 function main()
     # Random Number Generator
@@ -33,7 +48,7 @@ function main()
     numberOfPickupDeliveries = 10
     numberOfVehicles = 4
     problem = PDP.generateRandomMPDP(numberOfPickupDeliveries, numberOfVehicles, rng)
-
+    PDP.summary(problem)
     # Genetic Algorithm Parameters
     parameters = Parameters(10, 100, 0.8, 0.2)
 
@@ -53,9 +68,8 @@ function main()
     geneticAlgorithm!(generationParent, fitnessFunction, parameters, rng)
 
     # Output
-    println("Best solution: ", generationParent[1])
-    println("Second Best solution: ", generationParent[2])
-
+    summary(generationParent[1], problem)
+    summary(generationParent[2], problem)
 
 end
 main()
