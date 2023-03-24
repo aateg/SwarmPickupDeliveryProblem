@@ -1,7 +1,3 @@
-module Utils
-
-export DistanceMatrix, generateDistanceMatrix
-
 using Random: rand, AbstractRNG
 import Base: size
 
@@ -23,5 +19,3 @@ function generateDistanceMatrix(N::Int64, rng::AbstractRNG)::DistanceMatrix
     d = [sqrt((X[i] - X[j])^2 + (Y[i] - Y[j])^2) for i = 1:N, j = 1:N]
     return DistanceMatrix(d, X, Y)
 end
-
-end # modules
