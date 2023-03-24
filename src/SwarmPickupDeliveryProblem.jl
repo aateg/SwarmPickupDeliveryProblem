@@ -23,12 +23,12 @@ function initializeGenerationMPDP(
 end
 
 function initializeGenerationHeavyObjects(
-    requestsWeights::Dict{Int64, Int64},
+    requestsWeights::Dict{Int64,Int64},
     numberOfVehicles::Int64,
     populationSize::Int64,
     rng::AbstractRNG,
 )
-    requests = [request for (request, weights) in requestsWeights for _ in 1:weights]
+    requests = [request for (request, weights) in requestsWeights for _ = 1:weights]
     N = length(requests)
     return collect(
         Chromosome(
@@ -100,7 +100,8 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64)
 
     # Problem Definition
     problem = generateRandomMPDP(nRequests, nVehicles, rng)
-    requestsWeights = Dict{Int64, Int64}(i => rand(rng, 1:3) for i in 1:problem.numberOfPickupDeliveries)
+    requestsWeights =
+        Dict{Int64,Int64}(i => rand(rng, 1:3) for i = 1:problem.numberOfPickupDeliveries)
     printProblem(problem)
 
     # Genetic Algorithm Parameters
@@ -119,7 +120,8 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64)
         # if solution contain pair (request[i], vehicle[i]) duplicated then cost is zero
         for i = 1:length(solution.requests)
             for j = i+1:length(solution.requests)
-                if solution.requests[i] == solution.requests[j] && solution.vehicles[i] == solution.vehicles[j]
+                if solution.requests[i] == solution.requests[j] &&
+                   solution.vehicles[i] == solution.vehicles[j]
                     return 1E-6
                 end
             end
@@ -136,6 +138,6 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64)
     printSolution(generationParent[end], problem)
 
 end
-solveMPDPHeavyObjects(10,3)
+solveMPDPHeavyObjects(10, 3)
 
 end # module
