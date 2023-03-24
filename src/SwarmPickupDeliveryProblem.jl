@@ -1,13 +1,12 @@
 module SwarmPickupDeliveryProblem
 
-using Random: MersenneTwister, randperm, AbstractRNG
+export main
+
+using Random: MersenneTwister, randperm
 using StatsBase: sample
+using VRPGeneticAlgorithm: Chromosome, Parameters, geneticAlgorithm
 
-include("GeneticAlgorithm.jl")
-include("MultiplePickupDeliveryProblem.jl")
-
-using .GeneticAlgorithm: geneticAlgorithm, Parameters, Solution
-using .MultiplePickupDeliveryProblem: Problem, objFunction, generateRandomMPDP, printProblem
+include("pickupDeliveryProblem.jl")
 
 function initializeGeneration(
     numberOfPickupDeliveries::Int64,
@@ -16,26 +15,26 @@ function initializeGeneration(
     rng::AbstractRNG,
 )
     return collect(
-        Solution(
-            randperm(rng, numberOfPickupDeliveries), # cchromosome
-            sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true), # vchromosome
+        Chromosome(
+            randperm(rng, numberOfPickupDeliveries), # requests
+            sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true), # vehicles
         ) for i = 1:populationSize
     )
 end
 
-function printSolution(solution::Solution, problem::Problem)
+function printSolution(solution::Chromosome, problem::Problem)
     # for each vehicle I want to know the cities it visits
     # and compute the total distance
     println("\n")
-    println("Solution:")
-    println("- Chromosome: ", solution.cchromosome)
-    println("- Vehicles: ", solution.vchromosome)
-    cost = objFunction(solution.cchromosome, solution.vchromosome, problem)
+    println("Chromosome:")
+    println("- Chromosome: ", solution.requests)
+    println("- Vehicles: ", solution.vehicles)
+    cost = objFunction(solution.requests, solution.vehicles, problem)
     println("- Total Distance: ", 1 / cost)
     println("Cost: ", cost)
     println("Routes:")
     for vehicle = 1:problem.numberOfVehicles
-        visits = solution.cchromosome[solution.vchromosome.==vehicle]
+        visits = solution.requests[solution.vehicles.==vehicle]
         s = Int64[]
         push!(s, 0)
         for visit in visits
@@ -69,17 +68,16 @@ function main()
     )
 
     # Redefine Objective function
-    fitnessFunction(solution::Solution) =
-        objFunction(solution.cchromosome, solution.vchromosome, problem)
+    fitnessFunction(solution::Chromosome) =
+        objFunction(solution.requests, solution.vehicles, problem)
 
     # Execution
-    generationParent = geneticAlgorithm(generationParent, fitnessFunction, parameters, rng)
+    generationParent = geneticAlgorithm(generationParent, fitnessFunction, parameters, false, rng)
 
     # Output
     printSolution(generationParent[1], problem)
     printSolution(generationParent[end], problem)
 
 end
-main()
 
 end # module

@@ -1,12 +1,6 @@
-module MultiplePickupDeliveryProblem
+include("utils.jl")
 
-export Problem,
-    objFunction, totalDistancePairedSinglePickupDelivery, generateRandomMPDP, printProblem
-
-using Random: AbstractRNG, shuffle
-
-include("Utils.jl")
-using .Utils: DistanceMatrix, generateDistanceMatrix
+using Random: shuffle
 
 struct Problem
     numberOfPickupDeliveries::Int64
@@ -77,5 +71,3 @@ function printProblem(problem::Problem)
     println("- Pickup Locations: ", problem.P)
     println("- Delivery Locations: ", problem.D)
 end
-
-end # module
