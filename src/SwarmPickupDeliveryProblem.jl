@@ -120,7 +120,7 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64)
         for i = 1:length(solution.requests)
             for j = i+1:length(solution.requests)
                 if solution.requests[i] == solution.requests[j] && solution.vehicles[i] == solution.vehicles[j]
-                    return 0.0
+                    return 1E-6
                 end
             end
         end
