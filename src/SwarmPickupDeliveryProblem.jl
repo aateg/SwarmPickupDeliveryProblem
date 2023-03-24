@@ -6,9 +6,9 @@ using Random: MersenneTwister, randperm
 using StatsBase: sample
 using VRPGeneticAlgorithm: Chromosome, Parameters, geneticAlgorithm
 
-include("pickupDeliveryProblem.jl")
+include("mPDP.jl")
 
-function initializeGeneration(
+function initializeGenerationMPDP(
     numberOfPickupDeliveries::Int64,
     numberOfVehicles::Int64,
     populationSize::Int64,
@@ -18,6 +18,22 @@ function initializeGeneration(
         Chromosome(
             randperm(rng, numberOfPickupDeliveries), # requests
             sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true), # vehicles
+        ) for i = 1:populationSize
+    )
+end
+
+function initializeGenerationHeavyObjects(
+    requestsWeights::Dict{Int64, Int64},
+    numberOfVehicles::Int64,
+    populationSize::Int64,
+    rng::AbstractRNG,
+)
+    requests = [request for (request, weights) in requestsWeights for _ in 1:weights]
+    N = length(requests)
+    return collect(
+        Chromosome(
+            shuffle(rng, requests), # requests
+            sample(rng, 1:numberOfVehicles, N, replace = true), # vehicles
         ) for i = 1:populationSize
     )
 end
@@ -46,21 +62,19 @@ function printSolution(solution::Chromosome, problem::Problem)
     end
 end
 
-function main()
+function solveMPDP(nRequests::Int64, nVehicles::Int64)
     # Random Number Generator
     rng = MersenneTwister(1234)
 
     # Problem Definition
-    numberOfPickupDeliveries = 10
-    numberOfVehicles = 4
-    problem = generateRandomMPDP(numberOfPickupDeliveries, numberOfVehicles, rng)
+    problem = generateRandomMPDP(nRequests, nVehicles, rng)
     printProblem(problem)
 
     # Genetic Algorithm Parameters
     parameters = Parameters(10, 100, 0.8, 0.2)
 
     # Initialization
-    generationParent = initializeGeneration(
+    generationParent = initializeGenerationMPDP(
         problem.numberOfPickupDeliveries,
         problem.numberOfVehicles,
         parameters.populationSize,
@@ -78,7 +92,50 @@ function main()
     # Output
     printSolution(generationParent[1], problem)
     printSolution(generationParent[end], problem)
+end
+
+function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64)
+    # Random Number Generator
+    rng = MersenneTwister(1234)
+
+    # Problem Definition
+    problem = generateRandomMPDP(nRequests, nVehicles, rng)
+    requestsWeights = Dict{Int64, Int64}(i => rand(rng, 1:3) for i in 1:problem.numberOfPickupDeliveries)
+    printProblem(problem)
+
+    # Genetic Algorithm Parameters
+    parameters = Parameters(10, 100, 0.8, 0.2)
+
+    # Initialization
+    generationParent = initializeGenerationHeavyObjects(
+        requestsWeights,
+        problem.numberOfVehicles,
+        parameters.populationSize,
+        rng,
+    )
+
+    # Redefine Objective function
+    fitnessFunction(solution::Chromosome) = begin
+        # if solution contain pair (request[i], vehicle[i]) duplicated then cost is zero
+        for i = 1:length(solution.requests)
+            for j = i+1:length(solution.requests)
+                if solution.requests[i] == solution.requests[j] && solution.vehicles[i] == solution.vehicles[j]
+                    return 0.0
+                end
+            end
+        end
+        return objFunction(solution.requests, solution.vehicles, problem)
+    end
+
+    # Execution
+    generationParent =
+        geneticAlgorithm(generationParent, fitnessFunction, parameters, true, rng)
+
+    # Output
+    printSolution(generationParent[1], problem)
+    printSolution(generationParent[end], problem)
 
 end
+solveMPDPHeavyObjects(10,3)
 
 end # module
