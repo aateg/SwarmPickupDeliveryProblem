@@ -92,8 +92,14 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64)
     end
 
     # Execution
-    generationParent =
-        geneticAlgorithm(generationParent, fitnessFunction, parameters, rng, true, requestsWeights)
+    generationParent = geneticAlgorithm(
+        generationParent,
+        fitnessFunction,
+        parameters,
+        rng,
+        true,
+        requestsWeights,
+    )
 
     # Output
     printSolution(generationParent[1], requestsWeights, problem)
