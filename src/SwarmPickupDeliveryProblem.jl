@@ -8,27 +8,42 @@ using VRPGeneticAlgorithm: Chromosome, Parameters, geneticAlgorithm
 
 include("mPDP.jl")
 
-function initializeGenerationMPDP(
-    numberOfPickupDeliveries::Int64,
-    numberOfVehicles::Int64,
-    populationSize::Int64,
-    rng::AbstractRNG,
-)
-    return collect(
-        Chromosome(
-            randperm(rng, numberOfPickupDeliveries), # requests
-            sample(rng, 1:numberOfVehicles, numberOfPickupDeliveries, replace = true), # vehicles
-        ) for i = 1:populationSize
-    )
+function printSolution(solution::Chromosome, requestsWeights, problem::Problem)
+    # for each vehicle I want to know the cities it visits
+    # and compute the total distance
+    println("\n")
+    println("Solution With Duplicates? ", checkDuplicates(solution))
+    println("Weights per Request", requestsWeights)
+    cost = objFunction(solution.requests, solution.vehicles, problem)
+    println("- Total Distance: ", 1 / cost)
+    println("Cost: ", cost)
+    println("Routes:")
+    for vehicle = 1:problem.numberOfVehicles
+        visits = solution.requests[solution.vehicles.==vehicle]
+        println("- Vehicle $vehicle: ", [0; visits; 0])
+    end
+end
+
+function checkDuplicates(solution)
+    N = length(solution.requests)
+    for i = 1:N
+        for j = i+1:N
+            if solution.requests[i] == solution.requests[j] &&
+               solution.vehicles[i] == solution.vehicles[j]
+                return true
+            end
+        end
+    end
+    return false
 end
 
 function initializeGenerationHeavyObjects(
-    requestsWeights::Dict{Int64,Int64},
+    requestsWeights::Vector{Int64},
     numberOfVehicles::Int64,
     populationSize::Int64,
     rng::AbstractRNG,
 )
-    requests = [request for (request, weights) in requestsWeights for _ = 1:weights]
+    requests = [r for r = 1:length(requestsWeights) for _ = 1:requestsWeights[r]]
     N = length(requests)
     return collect(
         Chromosome(
@@ -38,70 +53,17 @@ function initializeGenerationHeavyObjects(
     )
 end
 
-function printSolution(solution::Chromosome, problem::Problem)
-    # for each vehicle I want to know the cities it visits
-    # and compute the total distance
-    println("\n")
-    println("Chromosome:")
-    println("- Chromosome: ", solution.requests)
-    println("- Vehicles: ", solution.vehicles)
-    cost = objFunction(solution.requests, solution.vehicles, problem)
-    println("- Total Distance: ", 1 / cost)
-    println("Cost: ", cost)
-    println("Routes:")
-    for vehicle = 1:problem.numberOfVehicles
-        visits = solution.requests[solution.vehicles.==vehicle]
-        s = Int64[]
-        push!(s, 0)
-        for visit in visits
-            push!(s, problem.P[visit])
-            push!(s, problem.D[visit])
-        end
-        push!(s, 0)
-        println("- Vehicle $vehicle: ", s)
-    end
-end
-
-function solveMPDP(nRequests::Int64, nVehicles::Int64)
-    # Random Number Generator
-    rng = MersenneTwister(1234)
-
-    # Problem Definition
-    problem = generateRandomMPDP(nRequests, nVehicles, rng)
-    printProblem(problem)
-
-    # Genetic Algorithm Parameters
-    parameters = Parameters(10, 100, 0.8, 0.2)
-
-    # Initialization
-    generationParent = initializeGenerationMPDP(
-        problem.numberOfPickupDeliveries,
-        problem.numberOfVehicles,
-        parameters.populationSize,
-        rng,
-    )
-
-    # Redefine Objective function
-    fitnessFunction(solution::Chromosome) =
-        objFunction(solution.requests, solution.vehicles, problem)
-
-    # Execution
-    generationParent =
-        geneticAlgorithm(generationParent, fitnessFunction, parameters, false, rng)
-
-    # Output
-    printSolution(generationParent[1], problem)
-    printSolution(generationParent[end], problem)
-end
-
 function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64)
     # Random Number Generator
     rng = MersenneTwister(1234)
 
     # Problem Definition
     problem = generateRandomMPDP(nRequests, nVehicles, rng)
-    requestsWeights =
-        Dict{Int64,Int64}(i => rand(rng, 1:3) for i = 1:problem.numberOfPickupDeliveries)
+    maxWeight = 2
+    requestsWeights = Vector{Int64}(undef, nRequests)
+    for i = 1:nRequests
+        requestsWeights[i] = rand(rng, 1:maxWeight)
+    end
     printProblem(problem)
 
     # Genetic Algorithm Parameters
@@ -131,11 +93,10 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64)
 
     # Execution
     generationParent =
-        geneticAlgorithm(generationParent, fitnessFunction, parameters, true, rng)
+        geneticAlgorithm(generationParent, fitnessFunction, parameters, rng, true, requestsWeights)
 
     # Output
-    printSolution(generationParent[1], problem)
-    printSolution(generationParent[end], problem)
+    printSolution(generationParent[1], requestsWeights, problem)
 
 end
 solveMPDPHeavyObjects(10, 3)
