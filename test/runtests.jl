@@ -10,7 +10,7 @@ using SwarmPickupDeliveryProblem
         @test checkDuplicates([1, 2, 3], [1, 1, 1]) == false
         @test checkDuplicates([1, 1, 3], [1, 2, 1]) == false
     end
-        
+
 
     @testset "Check Solution Ordering" begin
         @testset "Problem with only unit capacities" begin

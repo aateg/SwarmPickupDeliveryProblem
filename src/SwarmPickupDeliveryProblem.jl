@@ -12,9 +12,12 @@ function printSolution(solution::Chromosome, requestsWeights, problem::Problem)
     # for each vehicle I want to know the cities it visits
     # and compute the total distance
     println("\n")
-    println("Solution With Duplicates? ", checkDuplicates(solution.requests, solution.vehicles))
+    println(
+        "Solution With Duplicates? ",
+        checkDuplicates(solution.requests, solution.vehicles),
+    )
     println("R:", solution.requests)
-    println("Q:", [requestsWeights[i] for i = solution.requests])
+    println("Q:", [requestsWeights[i] for i in solution.requests])
     println("V:", solution.vehicles)
     cost = objFunction(solution.requests, solution.vehicles, problem)
     println("- Total Distance: ", 1 / cost)
@@ -45,7 +48,7 @@ function checkOrdering(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{Int64})
     maxNumberOfVehicles = 0 # maximum amount of vehicles needed for request
     vehiclesAllocated = Int64[] # vehicles allocated for each request
     for i = 1:N-1
-        if Q[i] == 1 
+        if Q[i] == 1
             if !(V[i] in vehiclesAllocated)
                 continue
             else
@@ -57,8 +60,8 @@ function checkOrdering(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{Int64})
                 # means that there are no vehicles allocated for the current request
                 # set the max count to the number of vehicles needed for this request
                 # add the vehicle to the list of allocated vehicles
-                maxNumberOfVehicles = Q[i] 
-                push!(vehiclesAllocated, V[i]) 
+                maxNumberOfVehicles = Q[i]
+                push!(vehiclesAllocated, V[i])
             else
                 if R[i-1] == R[i]
                     push!(vehiclesAllocated, V[i])
@@ -79,8 +82,11 @@ function checkOrdering(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{Int64})
 end
 
 isSolutionFeasible(solution::Chromosome, problem::Problem) = begin
-    checkDuplicates(solution.requests, solution.vehicles) && 
-    checkOrdering(solution.requests, solution.vehicles, [problem.requestsWeights[i] for i = solution.requests])
+    checkDuplicates(solution.requests, solution.vehicles) && checkOrdering(
+        solution.requests,
+        solution.vehicles,
+        [problem.requestsWeights[i] for i in solution.requests],
+    )
 end
 
 function initializeGenerationHeavyObjects(
@@ -99,7 +105,7 @@ function initializeGenerationHeavyObjects(
     )
 end
 
-function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::Int64 = 2)
+function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::Int64)
     # Random Number Generator
     rng = MersenneTwister(1234)
 
@@ -122,6 +128,7 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
     fitnessFunction(solution::Chromosome) = begin
         if isSolutionFeasible(solution, problem)
             return objFunction(solution.requests, solution.vehicles, problem)
+        end
         return 1E-6
     end
 
@@ -137,8 +144,6 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
 
     # Output
     printSolution(generationParent[1], requestsWeights, problem)
-
 end
-solveMPDPHeavyObjects(10, 3, 2)
 
 end # module

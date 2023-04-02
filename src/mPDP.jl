@@ -70,7 +70,14 @@ function generateRandomHeavyObjectProblem(
     for i = 1:nRequests
         requestsWeights[i] = rand(rng, 1:maxWeight)
     end
-    return Problem(numberOfPickupDeliveries, numberOfVehicles, distanceMatrix, P, D, requestsWeights)
+    return Problem(
+        numberOfPickupDeliveries,
+        numberOfVehicles,
+        distanceMatrix,
+        P,
+        D,
+        requestsWeights,
+    )
 end
 
 function printProblem(problem::Problem)
