@@ -30,7 +30,8 @@ function printSolution(solution::Chromosome, requestsWeights, problem::Problem)
 end
 
 function solutionFeasible(solution::Chromosome, problem::Problem)
-    solutionWithDuplicates = solutionContainsDuplicates(solution.requests, solution.vehicles)
+    solutionWithDuplicates =
+        solutionContainsDuplicates(solution.requests, solution.vehicles)
     realizable = solutionCorrectlyOrdered(
         solution.requests,
         solution.vehicles,
@@ -64,9 +65,9 @@ function solutionCorrectlyOrdered(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{
     # this function assumed that there are (R_i, V_i) duplicates
     # then all vehicles associated with R_i are different
     N = length(R)
-    allocations = Dict{Int64, Vector{Int64}}() # mapping requests and allocated vehicles
+    allocations = Dict{Int64,Vector{Int64}}() # mapping requests and allocated vehicles
     for i = 1:N
-        if isVehicleAllocated(V[i], allocations) 
+        if isVehicleAllocated(V[i], allocations)
             # cannot send an allocated vehicle to another request
             return false
         else
