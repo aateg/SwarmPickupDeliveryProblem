@@ -41,41 +41,36 @@ function solutionContainsDuplicates(R::Vector{Int64}, V::Vector{Int64})
     return false
 end
 
+function isVehicleAllocated(v::Int64, allocations::Dict{Int64,Vector{Int64}})
+    for (_, value) in allocations
+        if v in value
+            return true
+        end
+    end
+    return false
+end
+
 function solutionCorrectlyOrdered(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{Int64})
     # this function assumed that there are (R_i, V_i) duplicates
     # then all vehicles associated with R_i are different
     N = length(R)
-    maxNumberOfVehicles = 0 # maximum amount of vehicles needed for request
-    vehiclesAllocated = Int64[] # vehicles allocated for each request
-    for i = 1:N-1
-        if Q[i] == 1
-            if !(V[i] in vehiclesAllocated)
-                continue
+    allocations = Dict{Int64, Vector{Int64}}() # mapping requests and allocated vehicles
+    for i = 1:N
+        if isVehicleAllocated(V[i], allocations) 
+            # cannot send an allocated vehicle to another request
+            return false
+        else
+            # Able to be allocated
+            if R[i] in keys(allocations)
+                push!(allocations[R[i]], V[i])
             else
-                # cannot send an allocated vehicle to another request
-                return false
+                allocations[R[i]] = [V[i]]
             end
-        else # Q[i] > 1
-            if length(vehiclesAllocated) == 0
-                # means that there are no vehicles allocated for the current request
-                # set the max count to the number of vehicles needed for this request
-                # add the vehicle to the list of allocated vehicles
-                maxNumberOfVehicles = Q[i]
-                push!(vehiclesAllocated, V[i])
-            else
-                if R[i-1] == R[i]
-                    push!(vehiclesAllocated, V[i])
-                else
-                    # cannot change from request until it is not finished 
-                    return false
-                end
-                if length(vehiclesAllocated) == maxNumberOfVehicles
-                    # we have allocated all the vehicles needed for this request
-                    # reset the max count and the list of allocated vehicles
-                    maxNumberOfVehicles = 0
-                    vehiclesAllocated = Int64[]
-                end
-            end
+        end
+        if Q[R[i]] == length(allocations[R[i]])
+            # max vehicles allocated
+            # clear allocations
+            allocations[R[i]] = Int64[]
         end
     end
     return true
