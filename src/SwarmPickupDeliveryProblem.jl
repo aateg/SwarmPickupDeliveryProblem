@@ -29,6 +29,16 @@ function printSolution(solution::Chromosome, requestsWeights, problem::Problem)
     end
 end
 
+function solutionFeasible(solution::Chromosome, problem::Problem)
+    solutionWithDuplicates = solutionContainsDuplicates(solution.requests, solution.vehicles)
+    realizable = solutionCorrectlyOrdered(
+        solution.requests,
+        solution.vehicles,
+        [problem.requestsWeights[i] for i in solution.requests],
+    )
+    return !solutionWithDuplicates && realizable
+end
+
 function solutionContainsDuplicates(R::Vector{Int64}, V::Vector{Int64})
     N = length(R)
     for i = 1:N
@@ -101,7 +111,7 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
     printProblem(problem)
 
     # Genetic Algorithm Parameters
-    parameters = Parameters(10, 200, 0.8, 0.6)
+    parameters = Parameters(100, 100, 0.8, 0.6)
 
     # Initialization
     generationParent = initializeGenerationHeavyObjects(
@@ -113,21 +123,10 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
 
     # Redefine Objective function
     function fitnessFunction(solution::Chromosome)
-        solutionWithDuplicates = solutionContainsDuplicates(solution.requests, solution.vehicles)
-        solutionOrdered = solutionCorrectlyOrdered(
-            solution.requests,
-            solution.vehicles,
-            [problem.requestsWeights[i] for i in solution.requests],
-        )
-        if solutionWithDuplicates
-            return 1E-8
-        else
-            if solutionOrdered
-                return objFunction(solution.requests, solution.vehicles, problem)
-            else
-                return 1E-8
-            end
+        if solutionFeasible(solution, problem)
+            return objFunction(solution.requests, solution.vehicles, problem)
         end
+        return 1E-8
     end
 
     # Execution 
@@ -144,6 +143,6 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
     printSolution(generationParent[1], problem.requestsWeights, problem)
 end
 
-solveMPDPHeavyObjects(10, 3, 2)
+solveMPDPHeavyObjects(5, 3, 2)
 
 end # module
