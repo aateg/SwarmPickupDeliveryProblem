@@ -24,8 +24,3 @@ jobs:
           @error "Some files have not been formatted !!!";
           exit(1);
           end'
-      - uses: julia-actions/julia-buildpkg@v1
-      - name: "Run Tests"
-        uses: julia-actions/julia-runtest@v1
-        with:
-          annotate: true

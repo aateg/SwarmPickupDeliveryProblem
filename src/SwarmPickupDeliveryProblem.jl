@@ -72,7 +72,8 @@ function main()
         objFunction(solution.requests, solution.vehicles, problem)
 
     # Execution
-    generationParent = geneticAlgorithm(generationParent, fitnessFunction, parameters, false, rng)
+    generationParent =
+        geneticAlgorithm(generationParent, fitnessFunction, parameters, false, rng)
 
     # Output
     printSolution(generationParent[1], problem)
