@@ -5,6 +5,7 @@ export solveMPDPHeavyObjects, solutionContainsDuplicates, solutionCorrectlyOrder
 using Random: MersenneTwister, randperm
 using StatsBase: sample
 using VRPGeneticAlgorithm: Chromosome, Parameters, geneticAlgorithm
+using Printf
 
 include("mPDP.jl")
 
@@ -19,9 +20,6 @@ function printSolution(solution::Chromosome, requestsWeights, problem::Problem)
     println("R:", solution.requests)
     println("Q:", [requestsWeights[i] for i in solution.requests])
     println("V:", solution.vehicles)
-    cost = objFunction(solution.requests, solution.vehicles, problem)
-    println("- Total Distance: ", 1 / cost)
-    println("Cost: ", cost)
     println("Routes:")
     for vehicle = 1:problem.numberOfVehicles
         visits = solution.requests[solution.vehicles.==vehicle]
@@ -112,7 +110,7 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
     printProblem(problem)
 
     # Genetic Algorithm Parameters
-    parameters = Parameters(100, 100, 0.8, 0.6)
+    parameters = Parameters(500, 1000, 0.8, 0.6)
 
     # Initialization
     generationParent = initializeGenerationHeavyObjects(
@@ -131,7 +129,8 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
     end
 
     # Execution 
-    generationParent = geneticAlgorithm(
+    @time begin
+    generationParent, nInfeasibleSolutions = geneticAlgorithm(
         generationParent,
         fitnessFunction,
         parameters,
@@ -139,11 +138,15 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
         true,
         problem.requestsWeights,
     )
+    end
 
     # Output
-    printSolution(generationParent[1], problem.requestsWeights, problem)
+    bestSolution = generationParent[1]
+    printSolution(bestSolution, problem.requestsWeights, problem)
+    @printf "Cost: %.2E \n" 1 / fitnessFunction(bestSolution)
+    println("Infeasible Solutions: ", nInfeasibleSolutions / (parameters.populationSize * parameters.maxGenerations))
 end
 
-solveMPDPHeavyObjects(5, 3, 2)
+solveMPDPHeavyObjects(7, 2, 2)
 
-end # module
+end # modules
