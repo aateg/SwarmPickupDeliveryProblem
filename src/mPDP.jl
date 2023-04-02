@@ -66,8 +66,8 @@ function generateRandomHeavyObjectProblem(
     D = PandD[numberOfPickupDeliveries+1:numberOfCities-1]
 
     # Heavy Object
-    requestsWeights = Vector{Int64}(undef, nRequests)
-    for i = 1:nRequests
+    requestsWeights = Vector{Int64}(undef, numberOfPickupDeliveries)
+    for i = 1:numberOfPickupDeliveries
         requestsWeights[i] = rand(rng, 1:maxWeight)
     end
     return Problem(

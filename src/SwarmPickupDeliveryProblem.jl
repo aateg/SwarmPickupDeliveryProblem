@@ -1,6 +1,6 @@
 module SwarmPickupDeliveryProblem
 
-export main, checkDuplicates, checkOrdering
+export solveMPDPHeavyObjects, solutionContainsDuplicates, solutionCorrectlyOrdered
 
 using Random: MersenneTwister, randperm
 using StatsBase: sample
@@ -14,7 +14,7 @@ function printSolution(solution::Chromosome, requestsWeights, problem::Problem)
     println("\n")
     println(
         "Solution With Duplicates? ",
-        checkDuplicates(solution.requests, solution.vehicles),
+        solutionContainsDuplicates(solution.requests, solution.vehicles),
     )
     println("R:", solution.requests)
     println("Q:", [requestsWeights[i] for i in solution.requests])
@@ -29,7 +29,7 @@ function printSolution(solution::Chromosome, requestsWeights, problem::Problem)
     end
 end
 
-function checkDuplicates(R::Vector{Int64}, V::Vector{Int64})
+function solutionContainsDuplicates(R::Vector{Int64}, V::Vector{Int64})
     N = length(R)
     for i = 1:N
         for j = i+1:N
@@ -41,7 +41,7 @@ function checkDuplicates(R::Vector{Int64}, V::Vector{Int64})
     return false
 end
 
-function checkOrdering(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{Int64})
+function solutionCorrectlyOrdered(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{Int64})
     # this function assumed that there are (R_i, V_i) duplicates
     # then all vehicles associated with R_i are different
     N = length(R)
@@ -52,7 +52,7 @@ function checkOrdering(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{Int64})
             if !(V[i] in vehiclesAllocated)
                 continue
             else
-                println("cannot send an allocated vehicle to another request")
+                # cannot send an allocated vehicle to another request
                 return false
             end
         else # Q[i] > 1
@@ -66,7 +66,7 @@ function checkOrdering(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{Int64})
                 if R[i-1] == R[i]
                     push!(vehiclesAllocated, V[i])
                 else
-                    println("cannot change from request until it is not finished")
+                    # cannot change from request until it is not finished 
                     return false
                 end
                 if length(vehiclesAllocated) == maxNumberOfVehicles
@@ -79,14 +79,6 @@ function checkOrdering(R::Vector{Int64}, V::Vector{Int64}, Q::Vector{Int64})
         end
     end
     return true
-end
-
-isSolutionFeasible(solution::Chromosome, problem::Problem) = begin
-    checkDuplicates(solution.requests, solution.vehicles) && checkOrdering(
-        solution.requests,
-        solution.vehicles,
-        [problem.requestsWeights[i] for i in solution.requests],
-    )
 end
 
 function initializeGenerationHeavyObjects(
@@ -114,22 +106,33 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
     printProblem(problem)
 
     # Genetic Algorithm Parameters
-    parameters = Parameters(10, 100, 0.8, 0.2)
+    parameters = Parameters(10, 200, 0.8, 0.6)
 
     # Initialization
     generationParent = initializeGenerationHeavyObjects(
-        requestsWeights,
+        problem.requestsWeights,
         problem.numberOfVehicles,
         parameters.populationSize,
         rng,
     )
 
     # Redefine Objective function
-    fitnessFunction(solution::Chromosome) = begin
-        if isSolutionFeasible(solution, problem)
-            return objFunction(solution.requests, solution.vehicles, problem)
+    function fitnessFunction(solution::Chromosome)
+        solutionWithDuplicates = solutionContainsDuplicates(solution.requests, solution.vehicles)
+        solutionOrdered = solutionCorrectlyOrdered(
+            solution.requests,
+            solution.vehicles,
+            [problem.requestsWeights[i] for i in solution.requests],
+        )
+        if solutionWithDuplicates
+            return 1E-8
+        else
+            if solutionOrdered
+                return objFunction(solution.requests, solution.vehicles, problem)
+            else
+                return 1E-8
+            end
         end
-        return 1E-6
     end
 
     # Execution 
@@ -143,7 +146,9 @@ function solveMPDPHeavyObjects(nRequests::Int64, nVehicles::Int64, maxWeight::In
     )
 
     # Output
-    printSolution(generationParent[1], requestsWeights, problem)
+    printSolution(generationParent[1], problem.requestsWeights, problem)
 end
+
+solveMPDPHeavyObjects(10, 3, 2)
 
 end # module
