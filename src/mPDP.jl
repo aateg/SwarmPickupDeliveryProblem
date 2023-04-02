@@ -1,6 +1,6 @@
 include("utils.jl")
 
-using Random: shuffle
+using Random: shuffle, rand
 
 struct Problem
     numberOfPickupDeliveries::Int64
@@ -8,6 +8,7 @@ struct Problem
     distanceMatrix::DistanceMatrix
     P::Vector{Int64} # pickup locations
     D::Vector{Int64} # delivery location
+    requestsWeights::Vector{Int64}
 
     function Problem(
         numberOfPickupDeliveries::Int64,
@@ -15,8 +16,9 @@ struct Problem
         dist::DistanceMatrix,
         P::Vector{Int64},
         D::Vector{Int64},
+        requestsWeights::Vector{Int64},
     )
-        new(numberOfPickupDeliveries, numberOfVehicles, dist, P, D)
+        new(numberOfPickupDeliveries, numberOfVehicles, dist, P, D, requestsWeights)
     end
 end
 
@@ -51,9 +53,10 @@ function totalDistancePairedSinglePickupDelivery(
     return s
 end
 
-function generateRandomMPDP(
+function generateRandomHeavyObjectProblem(
     numberOfPickupDeliveries::Int64,
     numberOfVehicles::Int64,
+    maxWeight::Int64,
     rng::AbstractRNG,
 )
     numberOfCities = 2 * numberOfPickupDeliveries + 1 # depot is the last one
@@ -61,7 +64,13 @@ function generateRandomMPDP(
     PandD = shuffle(rng, 1:numberOfCities-1) # exclude the depot
     P = PandD[1:numberOfPickupDeliveries]
     D = PandD[numberOfPickupDeliveries+1:numberOfCities-1]
-    return Problem(numberOfPickupDeliveries, numberOfVehicles, distanceMatrix, P, D)
+
+    # Heavy Object
+    requestsWeights = Vector{Int64}(undef, nRequests)
+    for i = 1:nRequests
+        requestsWeights[i] = rand(rng, 1:maxWeight)
+    end
+    return Problem(numberOfPickupDeliveries, numberOfVehicles, distanceMatrix, P, D, requestsWeights)
 end
 
 function printProblem(problem::Problem)
@@ -70,4 +79,5 @@ function printProblem(problem::Problem)
     println("- Number of Vehicles: ", problem.numberOfVehicles)
     println("- Pickup Locations: ", problem.P)
     println("- Delivery Locations: ", problem.D)
+    println("- Requests Weights: ", problem.requestsWeights)
 end
